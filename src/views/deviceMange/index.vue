@@ -43,7 +43,7 @@
         </span> 
         <span class="span1">
           <el-input v-model="selsctInput"  placeholder="请输入搜索内容" style="width:400px"></el-input>
-          <el-button type="primary" icon="el-icon-search" @click="select()">快速搜索</el-button>
+          <el-button type="primary" icon="el-icon-search" @click="select()">快速搜索hah</el-button>
         </span>
       </div>
       <div class="content">
