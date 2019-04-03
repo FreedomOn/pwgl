@@ -1,5 +1,6 @@
 <template>
-  <div class="app-container">
+  <div class="contnet">
+    <div class="app-container">
     <div class="tree">
       <el-tree 
         :data="data2"
@@ -38,12 +39,12 @@
     <div class="body">
       <div class="header">
          <span>
-          <el-button type="primary" @click="facilityAdd()">设备添加</el-button>
-          <el-button type="primary">批量操作</el-button>
+          <el-button type="primary" size='small' @click="facilityAdd()">设备添加</el-button>
+          <el-button type="primary" size='small'>批量操作</el-button>
         </span> 
         <span class="span1">
           <el-input v-model="selsctInput"  placeholder="请输入搜索内容" style="width:400px"></el-input>
-          <el-button type="primary" icon="el-icon-search" @click="select()">快速搜索hah</el-button>
+          <el-button type="primary" icon="el-icon-search"  size='small' @click="select()">快速搜索</el-button>
         </span>
       </div>
       <div class="content">
@@ -53,6 +54,7 @@
           ref="multipleTable"
           tooltip-effect="dark"
           style="width: 100%"
+          height="420px"
           @selection-change="handleSelectionChange"
           v-loading="loading"
           element-loading-text="拼命加载中">
@@ -68,20 +70,24 @@
           <el-table-column
             prop="date"
             label="类型"
+            width="120"
            >
           </el-table-column>
            <el-table-column
             prop="date"
             label="版本"
+             width="120"
             >
           </el-table-column>
            <el-table-column
             prop="date"
             label="状态"
+             width="120"
             >
           </el-table-column>
            <el-table-column
             prop="date"
+             width="120"
             label="更新时间"
             >
           </el-table-column>
@@ -99,9 +105,9 @@
           width="300"
           >
           <template slot-scope="scope">
-            <el-button @click="mangeDetail(scope.row)" type="primary"  size="small">详情</el-button>
-            <el-button @click="mangeUpdata(scope.row)" type="primary"  size="small">状态</el-button>
-            <el-button @click="mangeDelete(scope.row)" type="primary" size="small">部署</el-button>
+            <el-button @click="mangeDetail(scope.row)" type="primary" plain size="small">详情</el-button>
+            <el-button @click="mangeUpdata(scope.row)" type="primary" plain size="small">状态</el-button>
+            <el-button @click="mangeDelete(scope.row)" type="primary" plain  size="small">部署</el-button>
           </template>
           </el-table-column>
         </el-table>
@@ -220,6 +226,7 @@
         <el-button type="primary" @click="sureAdd">确 定</el-button>
       </span>
     </el-dialog>
+  </div>
   </div>
 </template>
 
@@ -400,18 +407,29 @@ export default {
 </script>
 
 <style rel="stylesheet/scss" lang="scss" scoped>
+.contnet{
+  padding-top: 10px;
+  background: #efefef;
+}
 .app-container{
   overflow: hidden;
   background: #ffffff;
-  margin-top:25px;
+  // margin-top:25px;
+ 
+  
 }
+
+
   .tree{
     width: 20%;
     float: left;
+    padding-left: 20px;
   }
   .body{
     width: 78%;
     float: left;
+    padding: 20px 0 0 20px;
+    border-left: 1px solid #E4E7ED;
    .header{
      width: 100%;
     .span1{
@@ -420,7 +438,7 @@ export default {
    }
    .content{
      width: 100%;
-     margin-top: 20px
+     margin-top: 30px
    }
   }
 .addStyle{
@@ -440,4 +458,10 @@ export default {
   }
 }
 
+</style>
+<style>
+.el-input .el-input__inner{
+    height: 32px;
+    line-height: 32px;
+  }
 </style>

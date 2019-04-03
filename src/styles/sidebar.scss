@@ -1,15 +1,15 @@
 #app {
   // 主体区域
-  .main-container {
-    min-height: 100%;
-    transition: margin-left .28s;
-    margin-left: 180px;
-    position: relative;
-  }
+  // .main-container {
+  //   min-height: 100%;
+  //   transition: margin-left .28s;
+  //   // margin-left: 180px;
+  //   position: relative;
+  // }
   // 侧边栏
   .sidebar-container {
     transition: width 0.28s;
-    width: 180px !important;
+    // width: 180px !important;
     height: 100%;
     position: fixed;
     font-size: 0px;

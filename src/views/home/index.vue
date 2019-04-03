@@ -66,7 +66,7 @@ export default {
 <style rel="stylesheet/scss" lang="scss" scoped>
 .dashboard {
   &-container {
-    padding: 30px;
+    padding: 10px;
     background: #efefef;
   }
   &-text {

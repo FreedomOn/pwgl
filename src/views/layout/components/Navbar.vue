@@ -1,31 +1,20 @@
 <template>
-  <el-menu class="navbar" mode="horizontal">
-    <!-- <hamburger class="hamburger-container" :toggleClick="toggleSideBar" :isActive="sidebar.opened"></hamburger> -->
-    <!-- <breadcrumb></breadcrumb> -->
+ <div class="contain">
+    <div class="navbar" mode="horizontal">
     <div class="logoImage">
-    
+      FogCore
     </div>
     <div  class="headernav">
-      <ul>
-        <li>
-          <router-link to='/info'>概要信息</router-link>
-        </li>
-        <li>
-          <router-link to='/bushu'>部署总览</router-link>
-        </li>
-        <li>
-          <router-link to='/deviceMange'>设备管理</router-link>
-        </li>
-        <li>
-          <router-link to='/configurationInformation'>配置信息</router-link>
-        </li>
-        <li>
-          <router-link to='/containerApplication'>容器应用</router-link>
-        </li>
-        <li>
-          <router-link to='/SystemManagement'>系统管理</router-link>
-        </li>
-      </ul>
+        <el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal"  :router="true">
+           <el-menu-item index="/dashboard">首页</el-menu-item>
+        <el-menu-item index="/info">概要信息</el-menu-item>
+        <el-menu-item index="/bushu">部署总览</el-menu-item>
+        <el-menu-item index="/deviceMange">设备管理</el-menu-item>
+         <el-menu-item index="/configurationInformation">配置信息</el-menu-item>
+          <el-menu-item index="/containerApplication">容器应用</el-menu-item>
+          <el-menu-item index="/SystemManagement">系统管理</el-menu-item>
+</el-menu>
+<div class="line"></div>
     </div>
     <div class="avatar-username">
        {{name}}
@@ -46,9 +35,9 @@
         </el-dropdown-item>
       </el-dropdown-menu>
     </el-dropdown>
+  </div>
     <router-view></router-view>
-    
-  </el-menu>
+ </div>
 </template>
 
 <script>
@@ -59,7 +48,8 @@ import Hamburger from '@/components/Hamburger'
 export default {
   data () {
     return {
-      imgerr: ''
+      imgerr: '',
+     activeIndex:'/dashboard',
     }
   },
   components: {
@@ -106,14 +96,17 @@ export default {
 
 <style rel="stylesheet/scss" lang="scss" scoped>
 .navbar {
-  height: 50px;
-  line-height: 50px;
+  height: 60px;
+  line-height: 60px;
   border-radius: 0px !important;
   overflow: hidden;
   .logoImage{
     height: 100%;
     width: 20%;
-    background: url(/static/bg/aabg.png) no-repeat center center fixed;
+    background: #409EFF;
+    color: #fff;
+    text-align: center;
+    // background: url(/static/bg/aabg.png) no-repeat center center fixed;
     float: left;
   }
   .headernav{
