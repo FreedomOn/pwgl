@@ -92,9 +92,9 @@ const user = {
     // 获取用户信息
     GetuserInfo ({ commit, state}) {
       const data = JSON.parse(localStorage.getItem('user'))
-      commit('SET_TYPE', data.userType)
+      commit('SET_TYPE', data.type)
       commit('SET_USERLIST', data)
-      commit('SET_NAME', data.userName)
+      commit('SET_NAME', data.loginName)
       let avatar = null;
       let dataurl = data.archives_photo_ur
       if(dataurl) {

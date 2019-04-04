@@ -11,15 +11,12 @@ module.exports = {
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
     proxyTable: {
-      '/NMPWgcgk': {
-         target: 'http://47.104.17.68:8081/NMPWgcgkV1.0.2', // 测试服务器
-          // target: 'http://172.30.50.78:8080/NMPWgcgk',//吕欣航
-          //  target: 'http://172.30.50.84:8081/NMPWgcgk',//刘江波
-       
-        changeOrigin: true,
-        pathRewrite: {                //需要rewrite重写的, 如果在服务器端做了处理则可以不要这段
-          '^/NMPWgcgk': ''
-        }
+      '/wlsbgl': {
+          target: 'http://192.168.1.113:8080/wlsbgl', // 乔威
+          changeOrigin: true,
+          pathRewrite: {                //需要rewrite重写的, 如果在服务器端做了处理则可以不要这段
+            '^/wlsbgl': ''
+          }
       }
     },
 

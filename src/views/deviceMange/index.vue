@@ -63,7 +63,7 @@
             width="55">
           </el-table-column>
           <el-table-column
-            prop="date"
+            prop="name"
             label="设备名"
             width="120">
           </el-table-column>
@@ -232,14 +232,25 @@
 
 <script>
 import { mapGetters } from 'vuex'
-
+import { getDeviceData } from '@/api/device'
 let id=1000
 export default {
   name: 'dashboard',
   mounted() {
-    
+    this.getData()
   },
   methods: {
+    //获取所有设备
+      async getData () {
+      let that = this;
+      let devicesj = {
+         'pageSize':1,
+         'pageNum':10,
+       }
+      let newdata = await getDeviceData(devicesj) 
+        console.log(newdata)
+        this.tableData = newdata.rows
+      },
      handleNodeClick(data) {
         console.log(data);
       },
@@ -325,23 +336,7 @@ export default {
       },
      ]
     return {
-        tableData: [{
-            date: '2016-05-02',
-            name: '王小虎',
-            address: '上海市普陀区金沙江路 1518 弄'
-          }, {
-            date: '2016-05-04',
-            name: '王小虎',
-            address: '上海市普陀区金沙江路 1517 弄'
-          }, {
-            date: '2016-05-01',
-            name: '王小虎',
-            address: '上海市普陀区金沙江路 1519 弄'
-          }, {
-            date: '2016-05-03',
-            name: '王小虎',
-            address: '上海市普陀区金沙江路 1516 弄'
-          }],
+        tableData: [],
         data2: [{
           id: 1,
           label: '所有设备',
@@ -418,8 +413,6 @@ export default {
  
   
 }
-
-
   .tree{
     width: 20%;
     float: left;

@@ -1,12 +1,12 @@
 <template>
  <div class="contain">
     <div class="navbar" mode="horizontal">
-    <div class="logoImage">
+    <div class="logoImage" @click="toHome" style="cursor:pointer">
       FogCore
     </div>
     <div  class="headernav">
         <el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal"  :router="true">
-           <el-menu-item index="/dashboard">首页</el-menu-item>
+           <!-- <el-menu-item index="/dashboard">首页</el-menu-item> -->
         <el-menu-item index="/info">概要信息</el-menu-item>
         <el-menu-item index="/bushu">部署总览</el-menu-item>
         <el-menu-item index="/deviceMange">设备管理</el-menu-item>
@@ -70,7 +70,9 @@ export default {
     this.imgerr = "this.onerror='';this.src='" + require('@/assets/avatar/'+avatarname+'') + "'"
   },
   methods: {
-    
+    toHome:function(){
+      this.$router.push('/dashboard')
+    },
     // 获取头像404图片
     getAvatarerr (arr, type) {
        let avatararr = arr.filter((item) => {

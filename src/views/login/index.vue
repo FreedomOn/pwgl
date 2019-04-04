@@ -6,7 +6,7 @@
     <el-form class="login-form" autoComplete="on" :model="loginForm" :rules="loginRules" ref="loginForm" label-position="left">
       <p>用户名</p>
       <el-form-item prop="username">
-        <el-input name="username" type="text" v-model="loginForm.username" autoComplete="off" placeholder="工号" />
+        <el-input name="username" type="text" v-model="loginForm.name" autoComplete="off" placeholder="工号" />
       </el-form-item>
       <p>密码</p>
       <el-form-item prop="password">
@@ -54,8 +54,8 @@ export default {
       eye: 'eye',
       checked: true,
       loginForm: {
-        username: '12345678',
-        password: 'password1'
+        name: '123456',
+        password: '123456'
       },
       loginRules: {
         username: [{ required: true, trigger: 'blur', validator: validateUsername }],
@@ -82,15 +82,17 @@ export default {
       let that = this
       console.log(3333)
        let userdata = await login(data)
-       if(userdata.result == "false") {
+       console.log(userdata);
+       if(userdata.status !== 200) {
           that.$message.error('账号或密码错误，请联系管理员');
           that.loading = false
           return false
       }
-      sessionStorage.setItem('role', userdata.data.userNumber);
-      localStorage.setItem('role', userdata.data.userNumber);
-      localStorage.setItem('countryCode',userdata.data.countryCode);
-      localStorage.setItem('userType', userdata.data.userType);
+      sessionStorage.setItem('role', userdata.data.loginName);  //这个是路由拦截所需要的
+      // localStorage.setItem('role', userdata.data.userNumber);
+      // localStorage.setItem('countryCode',userdata.data.countryCode);
+      // localStorage.setItem('userType', userdata.data.userType);
+      console.log(4444)
       localStorage.setItem('user', JSON.stringify(userdata.data));
       that.$router.push({ path: '/' })
     },
