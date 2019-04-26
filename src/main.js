@@ -16,12 +16,18 @@ import App from './App'
 import router from './router'
 import store from './store'
 
+import BaiduMap from 'vue-baidu-map'
+
 import '@/icons' // icon
 import '@/permission' // permission control
 const qs = require('qs')
 
 Vue.use(ElementUI, { locale })
 Vue.use(VCharts)
+Vue.use(BaiduMap, {
+  // ak 是在百度地图开发者平台申请的密钥 详见 http://lbsyun.baidu.com/apiconsole/key */
+  ak: 'DNmlfhwkFOLiSovfFzm8Mj4IxxK6fbcO'
+})
 
 Vue.config.productionTip = false
 

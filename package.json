@@ -26,7 +26,8 @@
     "qs": "^6.5.2",
     "v-charts": "^1.17.10",
     "vue": "2.5.10",
-    "vue-auth-control": "^1.1.6",
+    "vue-auth-control": "^1.1.71",
+    "vue-baidu-map": "^0.21.20",
     "vue-router": "3.0.1",
     "vuex": "3.0.1"
   },

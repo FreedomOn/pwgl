@@ -182,7 +182,7 @@ $img: 100%;
     right: 0;
     width: 520px;
     padding: 35px 35px 15px 35px;
-    margin: 280px auto;
+    margin: 220px auto;
     background-color: rgba(255, 2555, 255, .9);
     box-shadow: -7px 4px 20px 0px rgba(0, 1, 1, 0.26);
 	  opacity: 0.9;
