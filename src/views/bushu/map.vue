@@ -1,6 +1,5 @@
 <template>
     <div class="app-container">
-        <button @click="addPoints" v-if='yincang'>hhhhh</button>
         <div class="header">
             <div class="header_left">
                 <span>地图工具</span>
@@ -11,29 +10,40 @@
             </div>   
         </div>
         <div class="map">
-            <baidu-map class="bm-view"   :center="center"   :zoom="zoom" :scroll-wheel-zoom="true">
+            <baidu-map class="map"   :center="center"  @ready="handler"  :zoom="zoom" :scroll-wheel-zoom="true"  @click="getClickInfo" >
                 <bm-geolocation anchor="BMAP_ANCHOR_BOTTOM_RIGHT" :showAddressBar="true" :autoLocation="true"></bm-geolocation>
                 <bm-point-collection :points="points" shape="BMAP_POINT_SHAPE_STAR" color="red" size="BMAP_POINT_SIZE_SMALL" @click="clickHandler"></bm-point-collection>
+                <bm-view style="width: 96%; height:600px;margin:auto"></bm-view>
             </baidu-map>
         </div>   
     </div>
 </template>
 <script>
+const jsonp = require('jsonp');
 export default {
   data () {
     return {
         center: {lng: 116.404, lat: 39.915},
-        zoom: 5,
+        zoom: 15,
         selsctInput:'',
-        points: [{lng:1,lat:1}],
-        yincang:false
+        points: []
      }
    },
-   mounted(){
-       this.addPoints()
-   },
   methods: {
-    handler({BMap,map}){
+     getClickInfo (e) {//点击获取对应的经纬度以及地点
+        this.center.lng = e.point.lng
+        this.center.lat = e.point.lat
+        let a =  e.point.lng; //经度
+        let b =  e.point.lat; //纬度
+        jsonp('http://api.map.baidu.com/geocoder/v2/?callback=renderReverse&location='+b+','+a+'&output=json&pois=0&ak=DNmlfhwkFOLiSovfFzm8Mj4IxxK6fbcO', null, (err, data) => {
+          if (err) {
+            console.error(err.message);
+          } else {
+            // console.log(data)
+          }
+        });
+      },
+     handler({BMap,map}){
          let that = this;
          console.log(BMap)
          console.log(map) 
@@ -43,7 +53,6 @@ export default {
     },
      addPoints () {
       let that = this;
-      console.log(222)
       const points = [];
       for (var i = 0; i < 1000; i++) {
         const position = {lng: Math.random() * 30 + 85, lat: Math.random() * 30 + 21}
@@ -83,10 +92,4 @@ export default {
     background: #f5f7fa;
     
 }
-.bm-view {
-  width: 96%;
-  height: 600px;
-  margin:auto;
-}
-
 </style>

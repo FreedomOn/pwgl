@@ -32,8 +32,8 @@
           <el-button type="primary" size='small' @click="excelDaochu()">设备导出</el-button>
         </span> 
         <span class="span1">
-          <el-input v-model="selsctInput"  placeholder="请输入搜索内容" style="width:400px"></el-input>
-          <el-button type="primary" icon="el-icon-search"  size='small' @click="select()">快速搜索</el-button>
+          <el-input v-model="selsctInput"  placeholder="请输入搜索内容" style="width:400px;border-radius: 30px"></el-input>
+          <el-button type="primary" icon="el-icon-search"  @click="select()">快速搜索</el-button>
         </span>
       </div>
       <div class="content">
@@ -43,7 +43,7 @@
           ref="multipleTable"
           tooltip-effect="dark"
           style="width: 100%"
-          height="420px"
+          :height="tableHeight"
           @selection-change="handleSelectionChange"
           v-loading="loading"
           element-loading-text="拼命加载中">
@@ -69,7 +69,7 @@
             >
           </el-table-column>
            <el-table-column
-            prop="date"
+            prop="devstate"
             label="状态"
              width="90"
             >
@@ -133,7 +133,7 @@
      <el-dialog
       title="添加网络设备"
       :visible.sync="adddialogVisible"
-      width="80%"
+      width="70%"
       :before-close="handleClose">
       <el-form :inline="true" :model="addNetwork" ref="addNetwork" :rules="rules">
         <div class="addStyle">
@@ -154,7 +154,7 @@
            <el-row>
               <el-col :span="12">
                 <el-form-item label="分组" prop='value'>
-                    <el-select v-model="addNetwork.value" placeholder="请选择" style="width:300px">
+                    <el-select v-model="addNetwork.value" placeholder="请选择" style="width:327px">
                     <el-option
                       v-for="item in addNetwork.selectGroup"
                       :key="item.id"
@@ -168,7 +168,7 @@
           <el-row>
               <el-col :span="12">
                   <el-form-item label="经度" prop='jingdu'>
-                  <el-input v-model="addNetwork.jingdu" clearable placeholder="请输入..." style="width:300px"></el-input>
+                  <el-input v-model="addNetwork.jingdu" clearable placeholder="请输入..." style="width:327px"></el-input>
                   </el-form-item> 
               </el-col>
               <el-col :span="12">
@@ -229,7 +229,7 @@
      <el-dialog
       title="修改网络设备"
       :visible.sync="updatedialogVisible"
-      width="80%"
+      width="70%"
       :before-close="handleClose">
       <el-form :inline="true" :model="updateNetwork" ref="updateNetwork" :rules="rules">
         <div class="addStyle">
@@ -326,7 +326,7 @@
       :visible.sync="detailDialogVisible"
       width="70%"
       :before-close="handleClose">
-      <el-tabs type="border-card" @tab-click="handleClick"  v-model="activeName">
+      <el-tabs type="border-card" @tab-click="handleClick"  v-model="activeName" style="height:540px">
         <el-tab-pane label="基本信息" name="first" class="detailInfo">
           <el-row>
              <el-col :span="18" class="detailname">{{terminalDevice}}</el-col>
@@ -397,10 +397,7 @@
             </el-form>
           </div>
           <el-row>  
-              <span class="descInfo">描述信息:</span>
-          </el-row>
-          <el-row class="descContent">  
-              <span>{{basicInfo.desc}}</span>
+              <span class="descInfo">描述信息:</span>  <span>{{basicInfo.desc}}</span>
           </el-row>
         </el-tab-pane>
         <el-tab-pane label="配置信息" name="second" class="detailInfo">配置信息</el-tab-pane>
@@ -488,7 +485,8 @@ export default {
          'pageSize':currentNum,
          'pageNum':everyNum,
          'type':-1,
-          'deviceGroupId':-1
+         'deviceGroupId':-1,
+         'statusId':-1
        }
       let newdata = await selectDevice(devicesj) 
         console.log(newdata)
@@ -499,6 +497,14 @@ export default {
             let newArr = [];
             arr.forEach(element =>{
               let i = element.type;
+              let j = element.statusId;
+              if(j == 0){
+                element.devstate = '在线'
+              }else if(j == 1){
+                element.devstate = '离线'
+              }else if(j == 2){
+                element.devstate = '故障'
+              }
               if (i == 0) {
                   element.statesdata = "网关设备"
                 }else if(i==1){
@@ -525,21 +531,42 @@ export default {
         console.log(`当前页: ${val}`);
         let that = this;
         that.currentPage = val;
+        that.loading = true;
         that.getData();
       },
       //左侧树  所有设备点击事件
      handleNodeClick(data) {
         let that = this;
         that.currentPage = 1;
-        console.log(data.label);
+        console.log(data);
         that.loading = true;
         if(data.label == '网关设备'){
-         that.deviceType = 0;
+          that.deviceType = 0;
+          that.devState = -1;
           console.log(333);
         }else if(data.label == '终端设备'){
            that.deviceType = 1;
+           that.devState = -1;
         }else if(data.label == '所有设备'){
            that.deviceType = -1;
+           that.devState = -1;
+        }
+        if(data.id == 3){
+           that.deviceType = 0;
+           that.devState = 0;
+        }else if(data.id == 4){
+           that.deviceType = 0;
+           that.devState = 1;
+        }
+        if(data.id == 5){
+          that.deviceType = 1;
+           that.devState = 0;
+        }else if(data.id == 6){
+          that.deviceType = 1;
+           that.devState = 1;
+        }else if(data.id == 7){
+          that.deviceType = 1;
+           that.devState = 2;
         }
         that.getTreeData();
       },
@@ -550,12 +577,14 @@ export default {
         let currentNum = that.currentPage;
         let everyNum = that.devicePageSize;
         let deviceState = that.deviceType;
+        let deviceStaID = that.devState;
         let devicesj = {
          'pageSize':currentNum,
          'pageNum':everyNum,
          'type':deviceState,
          'name':'',
-         'deviceGroupId':-1
+         'deviceGroupId':-1,
+         'statusId':deviceStaID
        }
        let treeData = await selectDevice(devicesj) 
        if(treeData.status == '200'){
@@ -564,6 +593,14 @@ export default {
            let newArr = [];
            arr.forEach(element =>{
               let i = element.type;
+              let j = element.statusId;
+              if(j == 0){
+                element.devstate = '在线'
+              }else if(j == 1){
+                element.devstate = '离线'
+              }else if(j == 2){
+                element.devstate = '故障'
+              }
               if (i == 0) {
                   element.statesdata = "网关设备"
                 }else if(i==1){
@@ -592,10 +629,12 @@ export default {
         let currentNum = that.currentPage;
         let everyNum = that.devicePageSize;
         let deviceid = that.deleteGroupId;
+        let deviceStaID = that.devState;
         let devicesj = {
          'pageSize':currentNum,
          'pageNum':everyNum,
-         'deviceGroupId':deviceid
+         'deviceGroupId':deviceid,
+         'statusId':deviceStaID
        }
        let treeData = await selectDevice(devicesj) 
        if(treeData.status == '200'){
@@ -604,6 +643,14 @@ export default {
            let newArr = [];
            arr.forEach(element =>{
               let i = element.type;
+              let j = element.statusId;
+              if(j == 0){
+                element.devstate = '在线'
+              }else if(j == 1){
+                element.devstate = '离线'
+              }else if(j == 2){
+                element.devstate = '故障'
+              }
               if (i == 0) {
                   element.statesdata = "网关设备"
                 }else if(i==1){
@@ -630,7 +677,8 @@ export default {
         let everyNum = that.devicePageSize;
         let selectContent = that.selsctInput;
         let deviceState = that.deviceType;
-        let deviceid = that.deleteGroupId
+        let deviceid = that.deleteGroupId;
+        let devicest =  that.devState
         let seldevicesj = {
           'pageSize':currentNum,
           'pageNum':everyNum,
@@ -638,6 +686,7 @@ export default {
           'name':selectContent,
           'uuid':'',
           'deviceGroupId':deviceid,
+          'statusId':devicest
         }
         let selcetsj = await selectDevice(seldevicesj) 
         if(selcetsj.status == '200'){
@@ -646,6 +695,14 @@ export default {
            let newArr = [];
            arr.forEach(element =>{
               let i = element.type;
+              let j = element.statusId;
+              if(j == 0){
+                element.devstate = '在线'
+              }else if(j == 1){
+                element.devstate = '离线'
+              }else if(j == 2){
+                element.devstate = '故障'
+              }
               if (i == 0) {
                   element.statesdata = "网关设备"
                 }else if(i==1){
@@ -719,7 +776,6 @@ export default {
           console.log(grouptreeData);
           let that = this;
           that.data5[0].children = grouptreeData.rows;
-          console.log(that.data5.children)
           console.log(that.data5)
           console.log(that.data5[0].children)
       },
@@ -1249,7 +1305,9 @@ export default {
         devicePageSize:10,
         total:1,
         deviceType:-1,
+        devState:-1,
         tableData: [],
+        tableHeight:window.innerHeight - 100,
         fenye:true,
         vrnoclick:true,
         updatenoclick:true,
@@ -1394,8 +1452,6 @@ export default {
   overflow: hidden;
   background: #ffffff;
   // margin-top:25px;
- 
-  
 }
   .tree{
     width: 15%;
@@ -1420,17 +1476,13 @@ export default {
      margin-top: 30px
    }
   }
-.addStyle{
-  border: 1px solid #126cd6;
-  border-bottom: none;
-  padding: 10px 40px;
-  span{
-    font-size: 20px
+  .addStyle{
+    padding: 10px 40px;
+    span{
+      font-size: 20px
+    }
   }
-}
-.addStyle1{
-    border: 1px solid #126cd6;
-    margin: 20px,20px;
+  .addStyle1{
     padding: 10px 40px;
     span{
     font-size: 20px
@@ -1440,16 +1492,12 @@ export default {
   margin: auto;
   text-align: center
 }
-// .detailInfo{
-//   // height: 400px;
-// }
 .detailname{
   font-size: 20px;
   font-weight: 600;
   padding: 10px 20px;
 }
 .basicInfomation{
-    border: 1px solid #3575e9;
     padding: 10px 20px;
     margin: 5px 5px;
 }
@@ -1462,21 +1510,8 @@ export default {
     display: inline-block;
     margin-left: 40px;
 }
-// .custom-tree-node{
-//   display: inline-block;
-//   width: 100px;
-// }
-// .groupdelete1{
-//    display: inline-block;
-// }
 .groupdelete{
    display: inline-block;
     margin: 0 20px !important;
 }
-</style>
-<style>
-.el-input .el-input__inner{
-    height: 32px;
-    line-height: 32px;
-  }
 </style>

@@ -19,9 +19,9 @@
     <div class="avatar-username">
        {{name}}
     </div>
-    <el-dropdown class="avatar-container" trigger="click">
+    <el-dropdown class="avatar-container"  trigger="click">
       <div class="avatar-wrapper">
-        <img class="user-avatar" :src="avatar" :onerror="imgerr">
+        <img class="user-avatar" :src="avatar" :onerror="imgerr" @click="personInfo()">
         <i class="el-icon-caret-bottom"></i>
       </div>
       <el-dropdown-menu class="user-dropdown" slot="dropdown">
@@ -35,6 +35,57 @@
         </el-dropdown-item>
       </el-dropdown-menu>
     </el-dropdown>
+    <el-dialog
+            title="个人设置"
+            :visible.sync="adduserdialogVisible"
+            width="60%"
+            :before-close="handleClose">
+                <div class="adduserbody">
+                    <div class="adduserbodyleft">
+                        <el-form :label-position="labelPosition" label-width="80px" :model="adduserform" :rules="rules" ref="adduserform">   
+                            <el-form-item label="姓名" prop="name">
+                                <el-input v-model="adduserform.name" style="width:400px"></el-input>
+                            </el-form-item>
+                            <el-form-item label="邮件" prop="email">
+                                <el-input v-model="adduserform.email" style="width:400px"></el-input>
+                            </el-form-item>
+                            <el-form-item label="电话" prop="phone">
+                                <el-input v-model="adduserform.phone" style="width:400px"></el-input>
+                            </el-form-item>
+                            <el-form-item label="原密码" prop="oldpassword">
+                                <el-input v-model="adduserform.oldpassword" type="password" style="width:400px"></el-input>
+                            </el-form-item>
+                            <el-form-item label="新密码" prop="newpassword">
+                                <el-input v-model="adduserform.newpassword" type="password" style="width:400px"></el-input>
+                            </el-form-item>
+                            <el-form-item label="确认密码" prop="twopassword">
+                                <el-input v-model="adduserform.twopassword" type="password" style="width:400px"></el-input>
+                            </el-form-item>
+                             
+                        </el-form>
+                    </div> 
+                    <div class="adduserbodyright">
+                        <el-form>
+                            <el-form-item label="头像上传:" prop="image">
+                                <el-upload
+                                    class="avatar-uploader"
+                                    action="https://ode.com/posts/"
+                                    :show-file-list="false"
+                                    :auto-upload="false"
+                                    :on-change ="updatainputUpload"
+                                    >
+                                    <img v-if="imageUrl" :src="imageUrl" class="avatar">
+                                    <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+                                </el-upload>
+                            </el-form-item>
+                        </el-form>
+                    </div>
+                </div>
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="adduserdialogVisible = false">取 消</el-button>
+                <el-button type="primary" @click="sureAddUser('adduserform')">确 定</el-button>
+            </span>
+        </el-dialog>
   </div>
     <router-view></router-view>
  </div>
@@ -47,9 +98,61 @@ import Hamburger from '@/components/Hamburger'
 
 export default {
   data () {
+    let validatePass = (rule, value, callback) => {
+        
+          if (this.adduserform.twopassword !== '') {
+            this.$refs.adduserform.validateField('twopassword');
+          }
+          callback();
+        
+      };
+      let validatePass2 = (rule, value, callback) => {
+        if (value === '') {
+          callback(new Error('请再次输入密码'));
+        } else if (value !== this.adduserform.newpassword) {
+          callback(new Error('两次输入密码不一致!'));
+        } else {
+          callback();
+        }
+      };
     return {
       imgerr: '',
-     activeIndex:'/dashboard',
+      activeIndex:'/dashboard',
+      adduserdialogVisible:false,
+      labelPosition: 'right',
+      imageUrl:'',
+      updataimagefile:'',
+      updataimagefileName:'',
+      adduserform:{
+          name:'',
+          email:'',
+          phone:'',
+          oldpassword:'',
+          newpassword:'',
+          twopassword:'',
+      },
+      rules: {
+        oldpassword: [
+          { required: true, message: '请输入原密码', trigger: 'blur' },
+        ],
+        name: [
+          { required: true, message: '请输入姓名', trigger: 'blur' }
+        ],
+        newpassword: [
+            { validator: validatePass, trigger: 'blur' }
+        ],
+        twopassword: [
+           { validator: validatePass2, trigger: 'blur' }
+        ],
+        email: [
+          {  required: true, message: '请输入邮件', trigger: 'blur' },
+          { type: 'email', message: '请输入正确的邮箱地址', trigger: 'blur,change' }
+        ],
+        phone: [
+          {  required: true, message: '请输入手机号', trigger: 'blur' },
+          { pattern: /^1[34578]\d{9}$/, message: '目前只支持中国大陆的手机号码' }
+        ],
+      },
     }
   },
   components: {
@@ -73,6 +176,88 @@ export default {
     toHome:function(){
       this.$router.push('/dashboard')
     },
+    handleClose(done) {
+            done();
+    },
+    //个人设置
+    personInfo:function(){
+      console.log(111)
+      // let that = this,
+      this.adduserdialogVisible = true;
+      let user =  JSON.parse(localStorage.getItem('user'));
+      this.adduserform.name = user.name;
+      this.adduserform.email = user.email;
+      this.adduserform.phone = user.phone;
+      this.adduserform.oldpassword = '';
+      this.adduserform.newpassword = '';
+      this.adduserform.twopassword = '';
+    },
+    updatainputUpload (file, fileList) {
+        const isJPG = file.raw.type === 'image/jpeg' || 'image/png';
+        const isLt2M = file.raw.size / 1024 / 1024 < 2;
+        if (!isJPG) {
+        this.$message.error('上传头像图片只能是 JPG 格式!');
+        return false
+        }
+        if (!isLt2M) {
+        this.$message.error('上传头像图片大小不能超过 2MB!');
+        return false
+        }
+        // return isJPG && isLt2M;
+        this.updataimagefile = file.raw
+        this.updataimagefileName = file.name
+        this.imageUrl = URL.createObjectURL(file.raw);
+        console.log(this.updataimagefile,this.updataimagefileName)
+    },
+    sureAddUser(adduserform){
+        let that = this;
+        that.$refs[adduserform].validate((valid) => {
+          if (valid) {
+              this.adduserdialogVisible = false;
+              let perinfo = JSON.parse(localStorage.getItem('user'));
+              let loginName = perinfo.loginName
+              let userid = perinfo.id
+              let infpData = {
+                'name':this.adduserform.name,
+                'loginName':loginName,
+                'email':this.adduserform.email,
+                'phone':this.adduserform.phone,
+                'password':this.adduserform.oldpassword,
+                'loginPassword':this.adduserform.newpassword,
+                'id':userid
+              }
+              that.$axios({
+                 method:'post',
+                 url:' /wlsbgl/user/updateUser',
+                 data: that.qs.stringify(infpData)  //将传递的参数变为字符形式
+              })
+              .then((res) =>{
+                  console.log(res)
+                   if(res.data.status == '200'){
+                    that.$notify({
+                        title: '成功',
+                        message: res.data.msg,
+                        type: 'success'
+                    });
+                    // localStorage.setItem('user', JSON.stringify(userdata.data));//返回用户当前更新后的信息
+                    // store.dispatch('GetuserInfo')
+                    }else{
+                      that.$notify.error({
+                              title: '失败',
+                              message: res.data.msg,
+                          });
+                    }
+              })
+              .catch((err) =>{
+                console.log(err)
+              })
+              
+          } else {
+              console.log('error submit!!');
+              return false;
+          }
+        });
+      },
     // 获取头像404图片
     getAvatarerr (arr, type) {
        let avatararr = arr.filter((item) => {
@@ -161,5 +346,44 @@ export default {
     }
   }
 }
+.adduserbody{
+    overflow: hidden;
+    .adduserbodyleft{
+        float: left;
+    }
+    .adduserbodyright{
+        float: right;
+    }
+}  
+// 上传图片
+.avatar-uploader {
+    
+    width: 270px;
+}
+.avatar-uploader .el-upload {
+    border: 1px dashed #d9d9d9;
+    border-radius: 6px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    // border: 1px dashed #333;
+  }
+  .avatar-uploader .el-upload:hover {
+    border-color: #409EFF;
+  }
+  .avatar-uploader-icon {
+    font-size: 28px;
+    color: #8c939d;
+    width: 178px;
+    height: 178px;
+    line-height: 178px;
+    text-align: center;
+    border: 1px dashed #333;
+  }
+  .avatar {
+    width: 178px;
+    height: 178px;
+    display: block;
+  }
 </style>
 

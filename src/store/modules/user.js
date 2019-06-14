@@ -94,7 +94,7 @@ const user = {
       const data = JSON.parse(localStorage.getItem('user'))
       commit('SET_TYPE', data.type)
       commit('SET_USERLIST', data)
-      commit('SET_NAME', data.loginName)
+      commit('SET_NAME', data.name)
       let avatar = null;
       let dataurl = data.archives_photo_ur
       if(dataurl) {

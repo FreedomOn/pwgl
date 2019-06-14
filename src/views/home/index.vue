@@ -7,7 +7,7 @@
         </div>
     </div>
     <div class="dashboard-bg">
-      <ve-histogram :data="chartData"></ve-histogram>
+      <!-- <ve-histogram :data="chartData"></ve-histogram> -->
     </div>
   </div>
 </template>

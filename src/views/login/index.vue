@@ -6,7 +6,7 @@
     <el-form class="login-form" autoComplete="on" :model="loginForm" :rules="loginRules" ref="loginForm" label-position="left">
       <p>用户名</p>
       <el-form-item prop="username">
-        <el-input name="username" type="text" v-model="loginForm.name" autoComplete="off" placeholder="工号" />
+        <el-input name="username" type="text" v-model="loginForm.name" autoComplete="off" placeholder="用户名" />
       </el-form-item>
       <p>密码</p>
       <el-form-item prop="password">
@@ -54,8 +54,8 @@ export default {
       eye: 'eye',
       checked: true,
       loginForm: {
-        name: '123456',
-        password: '123456'
+        name: '',
+        password: ''
       },
       loginRules: {
         username: [{ required: true, trigger: 'blur', validator: validateUsername }],
