@@ -38,7 +38,7 @@ export const constantRouterMap = [
       component: () => import('@/views/mainInfo/info')
     },{
       path:'bushu',//部署管理
-      component: () => import('@/views/bushu/index')
+      component: () => import('@/views/bushu/map')
     },{
       path:'deviceMange',//设备管理
       component: () => import('@/views/deviceMange/index')

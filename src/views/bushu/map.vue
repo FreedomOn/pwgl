@@ -1,95 +1,115 @@
+
 <template>
-    <div class="app-container">
-        <div class="header">
-            <div class="header_left">
-                <span>地图工具</span>
-            </div>
-            <div class="header_right">
-                <el-input v-model="selsctInput"  placeholder="请输入搜索内容" style="width:400px"></el-input>
-                <el-button type="primary"  icon="el-icon-search"   @click="select()">快速搜索</el-button>
-            </div>   
+  <div class="page">   
+    <div class="header">
+        <div class="header_left">
+            <span>地图工具</span>
         </div>
-        <div class="map">
-            <baidu-map class="map"   :center="center"  @ready="handler"  :zoom="zoom" :scroll-wheel-zoom="true"  @click="getClickInfo" >
-                <bm-geolocation anchor="BMAP_ANCHOR_BOTTOM_RIGHT" :showAddressBar="true" :autoLocation="true"></bm-geolocation>
-                <bm-point-collection :points="points" shape="BMAP_POINT_SHAPE_STAR" color="red" size="BMAP_POINT_SIZE_SMALL" @click="clickHandler"></bm-point-collection>
-                <bm-view style="width: 96%; height:600px;margin:auto"></bm-view>
-            </baidu-map>
+        <div class="header_right">
+            <el-input v-model="selsctInput"  placeholder="请输入搜索内容" style="width:400px"></el-input>
+            <el-button type="primary" icon="el-icon-search"   @click="select()">快速搜索</el-button>
         </div>   
+    </div> 
+    <div class="amap-wrapper">
+      <el-amap class="amap-box" :plugin="plugin" vid="amap-vue" :zoom="zoom" :center="center">
+          <el-amap-marker v-for="marker in markers" :key="
+          marker.id"  :position="marker.position" :events="marker.markderclick"></el-amap-marker>
+      </el-amap>
     </div>
+  </div>
 </template>
+
 <script>
-const jsonp = require('jsonp');
-export default {
-  data () {
-    return {
-        center: {lng: 116.404, lat: 39.915},
-        zoom: 15,
-        selsctInput:'',
-        points: []
-     }
-   },
-  methods: {
-     getClickInfo (e) {//点击获取对应的经纬度以及地点
-        this.center.lng = e.point.lng
-        this.center.lat = e.point.lat
-        let a =  e.point.lng; //经度
-        let b =  e.point.lat; //纬度
-        jsonp('http://api.map.baidu.com/geocoder/v2/?callback=renderReverse&location='+b+','+a+'&output=json&pois=0&ak=DNmlfhwkFOLiSovfFzm8Mj4IxxK6fbcO', null, (err, data) => {
-          if (err) {
-            console.error(err.message);
-          } else {
-            // console.log(data)
-          }
-        });
-      },
-     handler({BMap,map}){
-         let that = this;
-         console.log(BMap)
-         console.log(map) 
-     },
-     clickHandler (e) {
-      alert(`单击点的坐标为：${e.point.lng}, ${e.point.lat}`);
+  export default {
+    data () {
+      let self = this
+      return {
+       selsctInput:'',
+       uid: 3,
+       zoom: 12,
+       center: [120.163936,30.254841],
+       resdata: [],
+       markers: [],
+       plugin: [{
+            pName: 'Geolocation',
+            events: {
+              init(o) {
+                // o 是高德地图定位插件实例
+                o.getCurrentPosition((status, result) => {
+                  if (result && result.position) {
+                    // self.center = [result.position.lng, result.position.lat]
+                    self.$nextTick();
+                  }
+                });
+              }
+            }
+          }]
+      } 
     },
-     addPoints () {
-      let that = this;
-      const points = [];
-      for (var i = 0; i < 1000; i++) {
-        const position = {lng: Math.random() * 30 + 85, lat: Math.random() * 30 + 21}
-        points.push(position)
+    mounted () {
+       this.getdata()
+    },
+    methods: {
+      // 请求数据
+      getdata () {
+        let that = this;
+        this.$axios.post('/wlsbgl/device/getDeviceMap')
+          .then((res) => {
+            console.log(res.data)
+            that.getmark(res.data.rows)
+          })
+          .catch((err) => {
+            console.log(err)
+          })
+      },
+      // 获取地图图标数据
+      getmark (data) {
+         let markder = []
+         let that = this
+         data.forEach(ele => {
+            markder.push({
+                //  'id': ele.id,
+              'position': [ele.lng, ele.lat],
+            //    'markderclick': {
+            //     click: (id) => {
+            //         console.log(ele.id)
+            //         that.$router.push({
+            //            path:'/orderdetail', 
+            //            query: {
+            //               id: ele.id
+            //            }})
+            //     },
+            //   }
+            })
+         });
+         this.markers = markder
+         console.log(this.markers )
       }
-      that.points = points
-    }
-
+    },
   }
-}
-</script>  
+</script>
 
-<style rel="stylesheet/scss" lang="scss" scoped>
-.app-container{
-  overflow: hidden;
-  background: #ffffff;
-  margin-top:25px;
+<style scoped>
+.page {
+  height: 600px;
+  width: 100%;
 }
 .header{
-    height: 50px;
     width: 100%;
-    background: #f5f7fa;
-    margin: auto;
-    margin-top: -10px;
-    overflow: hidden;
-    .header_left{
-       float: left;
-       margin: 18px 31px;
-    }
-    .header_right{
-       float: right;
-       margin-top: 5px;
-       margin-right: 28px;
-    }
+    height: 10%;
+    background: #f1f1f1
 }
-.map{
-    background: #f5f7fa;
-    
+.header_left{
+    float: left;
+    margin: 18px 31px;
+}
+.header_right{
+    float: right;
+    margin-top: 5px;
+    margin-right: 28px;
+}
+.amap-wrapper {
+  width: 100%;
+  height: 90%;
 }
 </style>
