@@ -54,7 +54,7 @@ export default {
       eye: 'eye',
       checked: true,
       loginForm: {
-        name: '',
+        name: '123456',
         password: ''
       },
       loginRules: {

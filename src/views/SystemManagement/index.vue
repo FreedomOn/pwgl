@@ -421,11 +421,11 @@
             </span>
         </el-dialog>
          <el-dialog
-            title="删除角色"
+            title="删除用户"
             :visible.sync="deleteUserdialogVisible"
             width="50%"
             :before-close="handleClose">
-                <i class="el-icon-warning"></i> 删除角色后不可恢复，确定删除吗？
+                <i class="el-icon-warning"></i> 删除用户后不可恢复，确定删除吗？
             <span slot="footer" class="dialog-footer">
                 <el-button @click="deleteUserdialogVisible = false">取 消</el-button>
                 <el-button type="primary" @click="sureDeleteUser()">确 定</el-button>
@@ -515,10 +515,21 @@
                 <el-button @click="seeUserdialogVisible = false">关 闭</el-button>
             </span>
         </el-dialog>
+        <el-dialog
+        title="删除角色"
+        :visible.sync="deleteRoledialogVisible"
+        width="50%"
+        :before-close="handleClose">
+            <i class="el-icon-warning"></i> 删除角色后不可恢复，确定删除吗？
+        <span slot="footer" class="dialog-footer">
+            <el-button @click="deleteRoledialogVisible = false">取 消</el-button>
+            <el-button type="primary" @click="sureDeletejs()">确 定</el-button>
+        </span>
+        </el-dialog>
     </div>
 </template>
 <script>
-import  {selectUser,addUser,delUser,selectRole}  from '@/api/systemManagement'
+import  {selectUser,addUser,delUser,selectRole,addRoleTest,delRole}  from '@/api/systemManagement'
 export default {
   data() {
       return {
@@ -596,9 +607,12 @@ export default {
         roleTableData:[],
         roleloading:true,
         addroledialogVisible:false,
+        deleteRoledialogVisible:false,
+        deleteRoledid:'',
         roledata: [],
         rolevalue: [],
         roleinput:'',
+        permissionId:[],
         //事件列表
         eventDate:'',
         twoeventDate:'',
@@ -735,15 +749,6 @@ export default {
                 .then((res) => {
                     console.log(res.data);
                     this.roleOption = res.data;
-                    let arr = [];
-                    for(let i =0;i<res.data.length;i++){
-                       arr.push({
-                           key:res.data[i].id,
-                           label:res.data[i].name,
-                       })
-                    }
-                    console.log(arr)
-                    this.roledata = arr;
                 })
                 .catch((err) => {
                     console.log(err)
@@ -937,14 +942,81 @@ export default {
         addrole(){
             let that = this;
             that.addroledialogVisible = true;
-            that.getUserAndId();
-            that.rolevalue = [];
+            that.getrole();
+            that.rolevalue = [];  
+            that.getdatetime();   
+        },
+        //添加角色时查询权限的接口
+        getrole(){
+           this.$axios({
+                    method:'post',
+                    url:'/wlsbgl/permission/selectPermissionDescription',
+                })
+                .then((res) => {
+                    console.log(res.data);
+                    let arr = [];
+                    for(let i =0;i<res.data.length;i++){
+                       arr.push({
+                           key:res.data[i].id,
+                           label:res.data[i].description,
+                       })
+                    }
+                    console.log(arr)
+                    this.roledata = arr;
+                })
+                .catch((err) => {
+                    console.log(err)
+                });
         },
         rolehandleChange(value, direction, movedKeys) {
-            console.log(value, direction, movedKeys);
+            console.log(value, movedKeys);
+            let that = this;
+            // var arr = []
+            // for (let i in value) {
+            //     arr.push(value[i]); //属性
+            // }
+            // console.log(arr);
+            // console.log(typeof(value))
+            // console.log(JSON.stringify(value));
+            // console.log(typeof(JSON.stringify(value)));
+            that.permissionId = value.join(',');
         },
-        sureaddRole(){
-
+        async sureaddRole(){
+            let that = this;
+            let createTime =  that.nowTime;
+            let roleName  = that.roleinput;
+            let permissionId = that.permissionId;
+            let addroleData = {
+                'roleName':roleName,
+                'permissionId':permissionId,
+                'createTime':createTime,
+            };
+            console.log(addroleData)
+            if(roleName == ''){
+                this.$message({
+                    message: '请输入角色名字哦',
+                    type: 'warning'
+                    });
+            }else{
+                let addRoleSj = await addRoleTest(addroleData) 
+                console.log(addRoleSj)
+                if(addRoleSj.status == '200'){
+                    that.addroledialogVisible = false;
+                    that.$notify({
+                        title: '成功',
+                        message: '新增成功',
+                        type: 'success'
+                    });
+                    that.getallRole();
+                    }else{
+                    that.$notify.error({
+                            title: '失败',
+                            message: '新增失败',
+                        });
+                    }
+                    that.getallRole();
+                }
+            
         },
         //角色搜索
         async roleSelect(){
@@ -985,11 +1057,41 @@ export default {
         },
         //角色查看
         roleDetail(scope){
-
+            let that  = this;
+            console.log(scope);
         },
         //角色删除
         roleDel(scope){
-
+            console.log(scope);
+            let that = this;
+            that.deleteRoledialogVisible = true;
+            that.deleteRoledid = scope.id;
+        },
+        async sureDeletejs(){
+            let that = this;
+            let delRoleData = {
+                'id':that.deleteRoledid
+            };
+            console.log(delRoleData)
+            let delsj = await delRole(delRoleData);
+            console.log(delsj)
+            that.deleteRoledialogVisible = false;
+            if(delsj.status == '200'){
+            that.roleloading = false;
+            that.$notify({
+                title: '成功',
+                message: delsj.msg,
+                type: 'success'
+            });
+            that.getallRole();
+            }else{
+            that.roleloading = false;
+            that.$notify.error({
+                    title: '失败',
+                    message: delsj.msg,
+                });
+            that.getallRole();
+            }
         },
         //事件信息//获取所有信息事件
         getAllEcent(){

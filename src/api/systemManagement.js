@@ -69,3 +69,37 @@ export const selectRole = (selectRoleData) => {
            })
     })
 }
+//添加角色接口
+export const addRoleTest = (addroleData) => {
+    return new Promise((resolve,reject) =>{
+        request({
+            method:'post',
+            url:'/wlsbgl/role/addRole',
+            data: qs.stringify(addroleData)  //将传递的参数变为字符形式
+          })
+           .then((res) => {
+               resolve(res.data)
+           })
+           .catch((err) => {
+               console.log(err);
+               reject(err)
+           })
+    })
+}
+//角色删除接口
+export const delRole = (delRoleData) => {
+    return new Promise((resolve,reject) =>{
+        request({
+            method:'post',
+            url:'/wlsbgl/role/deleteRole',
+            data: qs.stringify(delRoleData)  //将传递的参数变为字符形式
+          })
+           .then((res) => {
+               resolve(res.data)
+           })
+           .catch((err) => {
+               console.log(err);
+               reject(err)
+           })
+    })
+}
