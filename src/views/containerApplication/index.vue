@@ -136,8 +136,8 @@
                                 >
                                 <template slot-scope="scope">
                                     <el-button-group>
-                                    <el-button @click="applyDetail(scope.row)" type="text"  size="small">查看</el-button>
-                                    <el-button @click="applyDel(scope.row)" type="text"  size="small">|删除</el-button>
+                                    <!-- <el-button @click="applyDetail(scope.row)" type="text"  size="small">查看|</el-button> -->
+                                    <el-button @click="applyDel(scope.row)" type="text"  size="small">删除</el-button>
                                     </el-button-group>
                                 </template>
                                 </el-table-column> 
@@ -199,7 +199,7 @@
                                 width="200">
                                 </el-table-column>
                                 <el-table-column
-                                prop=""
+                                prop="iotUser.name"
                                 label="创建人">
                                 </el-table-column>
                                  <el-table-column
@@ -209,8 +209,8 @@
                                 >
                                 <template slot-scope="scope">
                                     <el-button-group>
-                                    <el-button @click="mirroringDetail(scope.row)" type="text"  size="small">查看</el-button>
-                                    <el-button @click="mirroringDel(scope.row)" type="text"  size="small">|删除</el-button>
+                                    <!-- <el-button @click="mirroringDetail(scope.row)" type="text"  size="small">查看|</el-button> -->
+                                    <el-button @click="mirroringDel(scope.row)" type="text"  size="small">删除</el-button>
                                     </el-button-group>
                                 </template>
                                 </el-table-column>
@@ -254,7 +254,7 @@
                     </el-form-item>
                     <el-form-item label="选择镜像">
                         <el-checkbox-group v-model="checkedCities" @change="handleCheckedCitiesChange">
-                            <el-checkbox v-for="city in cities" :label="city">{{city.name}}</el-checkbox>
+                            <el-checkbox v-for="(city,index) in cities" :key="index" :label="city">{{city.name}}</el-checkbox>
                         </el-checkbox-group>
                     </el-form-item>
                 </el-form>
@@ -271,7 +271,7 @@
             :before-close="handleClose">
                 <el-form :label-position="labelPosition" label-width="80px" :model="mirroringform" :rules="rules" ref="mirroringform">
                     <el-form-item label="镜像名称"  prop="name">
-                        <el-input v-model="mirroringform.name"placeholder="请输入镜像名称" style="width:400px"></el-input>
+                        <el-input v-model="mirroringform.name" placeholder="请输入镜像名称" style="width:400px"></el-input>
                     </el-form-item>
                     <el-form-item label="版本"  prop="versions">
                         <el-input v-model="mirroringform.versions" placeholder="请输入版本" style="width:400px"></el-input>
@@ -344,7 +344,7 @@ export default {
         selsctInput:'',
         applyselsctInput:'',
         mirroringselsctInput:'',
-        tableHeight:window.innerHeight -100,
+        tableHeight:window.innerHeight -10,
         activeName:'one',
         mircurrentPage:1,
         mirPageSize:10,

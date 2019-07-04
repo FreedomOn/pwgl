@@ -8,6 +8,7 @@ Vue.use(Router)
 
 /* Layout */
 import Layout from '../views/layout/Layout'
+import map from '../views/bushu/map'
 
 /**
 * hidden: true                   if `hidden:true` will not show in the sidebar(default is false)
@@ -38,7 +39,7 @@ export const constantRouterMap = [
       component: () => import('@/views/mainInfo/info')
     },{
       path:'bushu',//部署管理
-      component: () => import('@/views/bushu/map')
+      component: map
     },{
       path:'deviceMange',//设备管理
       component: () => import('@/views/deviceMange/index')

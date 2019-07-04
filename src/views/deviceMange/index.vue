@@ -404,9 +404,9 @@
         <el-tab-pane label="事件列表" name="third" class="detailInfo">事件列表</el-tab-pane>
         <el-tab-pane label="容器应用"  name="fourth" class="detailInfo">容器应用</el-tab-pane>
       </el-tabs>
-      <span slot="footer" class="dialog-footer,detailFooter">
+      <!-- <span slot="footer" class="dialog-footer,detailFooter">
         <el-button @click="detailDialogVisible = false"  type="primary" >关闭</el-button>
-      </span>
+      </span> -->
     </el-dialog>
      <el-dialog
       title="删除分组"

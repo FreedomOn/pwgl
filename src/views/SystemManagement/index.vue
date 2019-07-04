@@ -133,8 +133,8 @@
                                 >
                                 <template slot-scope="scope">
                                     <el-button-group>
-                                    <el-button @click="roleDetail(scope.row)" type="text"  size="small">查看</el-button>
-                                    <el-button @click="roleDel(scope.row)" type="text"  size="small">|删除</el-button>
+                                    <!-- <el-button @click="roleDetail(scope.row)" type="text"  size="small">查看|</el-button> -->
+                                    <el-button @click="roleDel(scope.row)" type="text"  size="small">删除</el-button>
                                     </el-button-group>
                                 </template>
                                 </el-table-column>  
@@ -352,7 +352,7 @@
                             <el-form-item label="角色" prop="role">
                                 <el-select v-model="adduserform.role" placeholder="请选择角色权限" style="width:400px">
                                    <el-option
-                                    v-for="(item,index) in roleOption"
+                                    v-for="item in roleOption"
                                     :key="item.id"
                                     :label="item.name"
                                     :value="item.id">
@@ -539,7 +539,7 @@ export default {
         tabPosition: 'left',
         labelPosition: 'right',
         activeName:'one',
-        tableHeight:window.innerHeight -100,
+        tableHeight:window.innerHeight -10,
         //用户列表
         userSelsctInput:'',//用户快速搜索,
         userTableData:[],

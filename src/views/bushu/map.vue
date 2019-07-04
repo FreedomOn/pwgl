@@ -6,14 +6,15 @@
             <span>地图工具</span>
         </div>
         <div class="header_right">
-            <el-input v-model="selsctInput"  placeholder="请输入搜索内容" style="width:400px"></el-input>
+            <el-input v-model="selsctInput"  placeholder="请输入设备名字进行搜索" style="width:400px"></el-input>
             <el-button type="primary" icon="el-icon-search"   @click="select()">快速搜索</el-button>
         </div>   
     </div> 
     <div class="amap-wrapper">
       <el-amap class="amap-box" :plugin="plugin" vid="amap-vue" :zoom="zoom" :center="center">
-          <el-amap-marker v-for="marker in markers" :key="
-          marker.id"  :position="marker.position" :events="marker.markderclick"></el-amap-marker>
+          <el-amap-marker v-for="marker in markers" :key="  
+          marker.id"  :position="marker.position" :text="marker.text" :events="marker.markderclick"></el-amap-marker>
+          <el-amap-text v-for="(text,index) in markers" :key="index" :text="text.text" :offset="text.offset" :position="text.position" ></el-amap-text>
       </el-amap>
     </div>
   </div>
@@ -30,6 +31,7 @@
        center: [120.163936,30.254841],
        resdata: [],
        markers: [],
+       texts:[],
        plugin: [{
             pName: 'Geolocation',
             events: {
@@ -64,26 +66,45 @@
       },
       // 获取地图图标数据
       getmark (data) {
-         let markder = []
+         let markder = [];
+         let text = '';
          let that = this
          data.forEach(ele => {
             markder.push({
-                //  'id': ele.id,
-              'position': [ele.lng, ele.lat],
-            //    'markderclick': {
-            //     click: (id) => {
-            //         console.log(ele.id)
-            //         that.$router.push({
-            //            path:'/orderdetail', 
-            //            query: {
-            //               id: ele.id
-            //            }})
-            //     },
-            //   }
+              'id': ele.id,
+              'position': [ele.lat, ele.lng],
+              'text':ele.name,
+              'offset':[-2,-45],
+              'markderclick':{
+                click: (id) => {
+                console.log(id);
+                },
+              }
             })
          });
-         this.markers = markder
+
+         this.markers = markder;
+         this.texts = text;
          console.log(this.markers )
+      },
+      select(){
+          let that = this;
+          let selcontent = that.selsctInput;
+          let sel = {
+            'name':selcontent
+          }
+          that.$axios({
+          method:'post',
+          url:'/wlsbgl/device/getDeviceMap',
+          data: that.qs.stringify(sel)  //将传递的参数变为字符形式
+         })
+          .then((res) => {
+            console.log(res.data)
+            that.getmark(res.data.rows)
+          })
+          .catch((err) => {
+            console.log(err)
+          })
       }
     },
   }
@@ -91,7 +112,7 @@
 
 <style scoped>
 .page {
-  height: 600px;
+  height: 650px;
   width: 100%;
 }
 .header{
