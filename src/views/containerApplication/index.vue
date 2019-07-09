@@ -55,9 +55,9 @@
                                 >
                                 <template slot-scope="scope">
                                     <el-button-group>
-                                    <el-button @click="deployDetail(scope.row)" type="text"  size="small">查看</el-button>
-                                    <el-button @click="deployReload(scope.row)" type="text"  size="small">|重启</el-button>
-                                    <el-button @click="applicationDeployment(scope.row)" type="text"  size="small">|应用部署</el-button>
+                                    <el-button @click="deployDetail(scope.row)" type="info" icon="el-icon-info" size="small">查看</el-button>
+                                    <el-button @click="deployReload(scope.row)" type="primary" icon="el-icon-refresh" size="small">重启</el-button>
+                                    <el-button @click="applicationDeployment(scope.row)" type="primary" icon="el-icon-setting" size="small">应用部署</el-button>
                                     <!-- <el-button @click="mangedelete(scope.row)" type="text"  size="small">|删除</el-button>
                                     <el-button @click="mangeupdate(scope.row)" type="text"  size="small">|编辑</el-button> -->
                                     </el-button-group>
@@ -136,8 +136,8 @@
                                 >
                                 <template slot-scope="scope">
                                     <el-button-group>
-                                    <!-- <el-button @click="applyDetail(scope.row)" type="text"  size="small">查看|</el-button> -->
-                                    <el-button @click="applyDel(scope.row)" type="text"  size="small">删除</el-button>
+                                    <el-button @click="applyDetail(scope.row)" type="primary" icon="el-icon-info" size="small">查看</el-button>
+                                    <el-button @click="applyDel(scope.row)" type="danger"  icon="el-icon-delete" size="small">删除</el-button>
                                     </el-button-group>
                                 </template>
                                 </el-table-column> 
@@ -209,8 +209,8 @@
                                 >
                                 <template slot-scope="scope">
                                     <el-button-group>
-                                    <!-- <el-button @click="mirroringDetail(scope.row)" type="text"  size="small">查看|</el-button> -->
-                                    <el-button @click="mirroringDel(scope.row)" type="text"  size="small">删除</el-button>
+                                    <el-button @click="mirroringDetail(scope.row)" type="primary"  icon="el-icon-info"  size="small">查看</el-button>
+                                    <el-button @click="mirroringDel(scope.row)" type="danger" icon="el-icon-delete"  size="small">删除</el-button>                             
                                     </el-button-group>
                                 </template>
                                 </el-table-column>
@@ -253,9 +253,17 @@
                         </el-input>
                     </el-form-item>
                     <el-form-item label="选择镜像">
-                        <el-checkbox-group v-model="checkedCities" @change="handleCheckedCitiesChange">
+                         <el-select v-model="selectvalue" multiple placeholder="请选择" filterable  @change="nowmirr" style="width:400px">
+                            <el-option
+                            v-for="item in cities"
+                            :key="item.id"
+                            :label="item.name"
+                            :value="item.id">
+                            </el-option>
+                        </el-select>
+                        <!-- <el-checkbox-group v-model="checkedCities" @change="handleCheckedCitiesChange">
                             <el-checkbox v-for="(city,index) in cities" :key="index" :label="city">{{city.name}}</el-checkbox>
-                        </el-checkbox-group>
+                        </el-checkbox-group> -->
                     </el-form-item>
                 </el-form>
             <span slot="footer" class="dialog-footer">
@@ -393,6 +401,7 @@ export default {
         mirroringfile:'',
         nowTime:'',
         applyDialogVisible:false,
+        selectvalue:[],
         applyform:{
           name: '',
           versions: '',
@@ -408,13 +417,23 @@ export default {
     mounted(){
         let that = this;
         that.getdatetime();//获取时间
+        that.getAllContail();
+        that.getApplyData();
+        that.getMirroringData();
+        let activetab = localStorage.getItem('activetab');
+        if(!activetab){
+             this.activeName = 'one'
+        }else{
+             this.activeName = activetab;
+        }
     },
     methods: {
         //点击左侧导航事件
         handleClick(tab, event) {
             let that = this;
             console.log(tab.paneName);
-            console.log(event)
+            console.log(event);
+            localStorage.setItem('activetab', tab.paneName);
             if(tab.paneName == 'two'){
                 //点击进入到应用管理触发事件
                 console.log('应用管理')
@@ -548,18 +567,25 @@ export default {
             that.applyform.versions = '';
             that.applyform.textarea = '';
             that.checkedCities = [];
+            that.selectvalue = [];
         },
         //应用添加选择镜像
-        handleCheckedCitiesChange(value) {
-            let that = this;
+        nowmirr(value){
             console.log(value)
-            let idList = [];
-            for(let i =0;i<value.length;i++){
-                idList.push(value[i].id)
-            }
-            that.idArr = idList.join(',');
-            console.log( that.idArr)
-           },
+            let that = this;
+            console.log(value.join(','))
+            that.idArr = value.join(',');
+        },
+        // handleCheckedCitiesChange(value) {
+        //     let that = this;
+        //     console.log(value)
+        //     let idList = [];
+        //     for(let i =0;i<value.length;i++){
+        //         idList.push(value[i].id)
+        //     }
+        //     that.idArr = idList.join(',');
+        //     console.log( that.idArr)
+        //    },
         //应用添加确定
         applySure(applyform){
             this.$refs[applyform].validate((valid) => {
@@ -617,17 +643,23 @@ export default {
             let that = this;
         },
         //应用删除
-        applyDel(scope){
-            console.log(scope);
-            let that = this;
-            that.applyDelid = scope.id;
-            that.deleteApplydialogVisible = true;
+         applyDel (data) {
+            let that = this
+            this.$confirm('此操作将删除一条应用, 是否继续?', '提示', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning'
+            }).then(() => {
+            that.sureDeleteApply(data)
+            }).catch(() => {
+            console.log('取消了删除')
+        })
         },
-        async sureDeleteApply(){
+        async sureDeleteApply(scope){
             let that = this;
             let delId = that.applyDelid;
             let delData = {
-             'id':delId,
+             'id':scope.id,
             }
             let delsj = await delApplyDevice(delData);
             console.log(delsj)
@@ -711,6 +743,11 @@ export default {
         mirroringUoload(){
             let that = this;
             that.mirroringDialogVisible = true;
+            that.mirroringform.name = '';
+            that.mirroringform.textarea = '';
+            that.mirroringform.radio ='';
+            that.mirroringform.versions ='';
+            that.mirroringfile = '';
         },
         //镜像上传选择文件
         handleChange(file) {
@@ -790,17 +827,23 @@ export default {
             console.log(scope)
         },
         //删除
-        mirroringDel:function(scope){
-            console.log(scope);
-              let that = this;
-              that.delid = scope.id;
-              that.deleteDevicedialogVisible = true;
+        mirroringDel (data) {
+            let that = this
+            this.$confirm('此操作将删除一条镜像信息, 是否继续?', '提示', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning'
+            }).then(() => {
+            that.sureDeleteDevice(data)
+            }).catch(() => {
+            console.log('取消了删除')
+          })
         },
-        async sureDeleteDevice(){
+        async sureDeleteDevice(scope){
             let that = this;
             let delId = that.delid;
             let delData = {
-             'id':delId,
+             'id':scope.id,
             }
             let delsj = await delDevice(delData);
             console.log(delsj)

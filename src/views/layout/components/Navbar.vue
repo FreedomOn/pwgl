@@ -1,11 +1,11 @@
 <template>
  <div class="contain">
     <div class="navbar" mode="horizontal">
-    <div class="logoImage" @click="toHome" style="cursor:pointer">
+    <div class="logoImage"  style="cursor:pointer">
       FogCore
     </div>
     <div  class="headernav">
-        <el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal"  :router="true">
+        <el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal"  @select="handleSelect" :router="true">
            <!-- <el-menu-item index="/dashboard">首页</el-menu-item> -->
         <el-menu-item index="/info">概要信息</el-menu-item>
         <el-menu-item index="/bushu">部署总览</el-menu-item>
@@ -16,21 +16,21 @@
 </el-menu>
 <div class="line"></div>
     </div>
-    <div class="avatar-username">
+    <div class="avatar-username"  @click="personInfo()" style="cursor:pointer">
        {{name}}
     </div>
     <el-dropdown class="avatar-container"  trigger="click">
       <div class="avatar-wrapper">
-        <img class="user-avatar" :src="avatar" :onerror="imgerr" @click="personInfo()">
+        <img class="user-avatar" :src="avatar" :onerror="imgerr">
         <i class="el-icon-caret-bottom"></i>
       </div>
       <el-dropdown-menu class="user-dropdown" slot="dropdown">
-        <router-link class="inlineBlock" to="/">
-          <el-dropdown-item>
-            首页
-          </el-dropdown-item>
-        </router-link>
-        <el-dropdown-item divided>
+        <!-- <router-link class="inlineBlock" to="/info"> -->
+          <!-- <el-dropdown-item>
+            <span @click="goHome">首页</span> 
+          </el-dropdown-item> -->
+        <!-- </router-link> -->
+        <el-dropdown-item >
           <span @click="logout" style="display:block;">退出</span>
         </el-dropdown-item>
       </el-dropdown-menu>
@@ -117,7 +117,7 @@ export default {
       };
     return {
       imgerr: '',
-      activeIndex:'/dashboard',
+      activeIndex:'/info',
       adduserdialogVisible:false,
       labelPosition: 'right',
       imageUrl:'',
@@ -169,16 +169,43 @@ export default {
     ])
   },
   mounted() {
-    let avatarname = this.getAvatarerr(this.avatartype, this.usertype)
-    this.imgerr = "this.onerror='';this.src='" + require('@/assets/avatar/'+avatarname+'') + "'"
+    let avatarname = this.getAvatarerr(this.avatartype, this.usertype);
+    this.imgerr = "this.onerror='';this.src='" + require('@/assets/avatar/'+avatarname+'') + "'";
+    this.getactive();
   },
   methods: {
-    toHome:function(){
-      this.$router.push('/dashboard')
+    // toHome:function(){
+    //   this.$router.push('/info')
+    // },
+    goHome:function(){
+      console.log('sss')
+      // this.getactive(); 
+      this.$router.push('/info')
+      // localStorage.setItem("haha", "/info");
+      // this.activeIndex = localStorage.getItem('haha');
+      location.reload()
+         
+    },
+    getactive:function(){
+      let active = localStorage.getItem('haha');
+      console.log(222222)
+      console.log(active)
+      if(!active){
+          this.activeIndex = '/info'
+      }else{
+        this.activeIndex = active;
+      } 
     },
     handleClose(done) {
-            done();
+       done();
     },
+     handleSelect(key, keyPath) {
+        localStorage.removeItem("activetab")
+        localStorage.removeItem("sysactivetab")
+        console.log(key, keyPath);
+        let aa = key;
+        localStorage.setItem('haha', aa);
+      },
     //个人设置
     personInfo:function(){
       console.log(111)
@@ -271,11 +298,11 @@ export default {
     logout() {
       sessionStorage.removeItem("role")
       localStorage.removeItem("user")
+      localStorage.removeItem("haha")
       location.reload()
       // this.$store.dispatch('LogOut').then(() => {
       //   location.reload() // 为了重新实例化vue-router对象 避免bug
       // })
-
     }
   }
 }

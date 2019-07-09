@@ -9,7 +9,14 @@
         node-key="id"
         highlight-current
         @node-click="handleNodeClick"
-        :props="defaultProps">
+        :props="defaultProps"
+        >
+         <span class="custom-tree-node" slot-scope="{ node, data }">
+                      <span>{{ node.label }}</span>
+                      <span>
+                              <a class="num-tag">{{data.num}}</a>
+                      </span>
+          </span>
       </el-tree>
       <el-tree
         :data="data5"
@@ -91,15 +98,15 @@
           <el-table-column
           fixed="right"
           label="操作"
-          width="200"
+          width="310"
           >
           <template slot-scope="scope">
             <el-button-group>
-            <el-button @click="mangeDetail(scope.row)" type="text"  size="small">详情</el-button>
-            <el-button @click="mangeState(scope.row)" type="text"  size="small">|状态</el-button>
-            <el-button @click="mangeBushu(scope.row)" type="text"  size="small">|部署</el-button>
-            <el-button @click="mangedelete(scope.row)" type="text"  size="small">|删除</el-button>
-            <el-button @click="mangeupdate(scope.row)" type="text"  size="small">|编辑</el-button>
+              <el-button @click="mangeDetail(scope.row)" type="info" icon="el-icon-info"  size="small">详情</el-button>
+              <!-- <el-button @click="mangeState(scope.row)" type="text"  size="small">|状态</el-button> -->
+              <el-button @click="mangeBushu(scope.row)"  type="primary" icon="el-icon-setting" size="small">部署</el-button>
+              <el-button @click="mangedelete(scope.row)" type="danger" icon="el-icon-delete" size="small">删除</el-button>
+              <el-button @click="mangeupdate(scope.row)" type="primary" icon="el-icon-edit" size="small">编辑</el-button> 
             </el-button-group>
           </template>
           </el-table-column>
@@ -473,6 +480,7 @@ export default {
   mounted() {
     this.getData();  
     this.getTreeGroup();
+    this.getnum();
   },
   methods: {
     //获取所有设备
@@ -489,36 +497,110 @@ export default {
          'statusId':-1
        }
       let newdata = await selectDevice(devicesj) 
-        console.log(newdata)
-        if(newdata.status == '200'){
-           that.fenye = true;
-           let arr = newdata.rows;
-            // console.log(arr);
-            let newArr = [];
-            arr.forEach(element =>{
-              let i = element.type;
-              let j = element.statusId;
-              if(j == 0){
-                element.devstate = '在线'
-              }else if(j == 1){
-                element.devstate = '离线'
-              }else if(j == 2){
-                element.devstate = '故障'
+        // console.log(newdata)
+      if(newdata.status == '200'){
+          that.fenye = true;
+          let arr = newdata.rows;
+          // console.log(arr);
+          let newArr = [];
+          arr.forEach(element =>{
+            let i = element.type;
+            let j = element.statusId;
+            if(j == 0){
+              element.devstate = '在线'
+            }else if(j == 1){
+              element.devstate = '离线'
+            }else if(j == 2){
+              element.devstate = '故障'
+            }
+            if (i == 0) {
+                element.statesdata = "网关设备"
+              }else if(i==1){
+                element.statesdata = "终端设备"
               }
-              if (i == 0) {
-                  element.statesdata = "网关设备"
-                }else if(i==1){
-                  element.statesdata = "终端设备"
-                }
-                newArr.push(element)
-            })
-            // console.log(newArr)
-            this.tableData = newArr;
-            this.total = newdata.total;
-            this.loading = false;
-          }else {
-            this.loading = false;
-          } 
+              newArr.push(element)
+          })
+          // console.log(newArr)
+          this.tableData = newArr;
+          this.total = newdata.total;
+          this.loading = false;
+        }else {
+          this.loading = false;
+        } 
+      },
+      async getnum(){
+          let that = this;
+          let currentNum = that.currentPage;
+          let everyNum = that.devicePageSize;
+          let gatewayTotal = 0;
+          let data2 = that.data2;
+          let devicewg = {
+            'pageSize':currentNum,
+            'pageNum':everyNum,
+            'type':0,
+            'deviceGroupId':-1,
+            'statusId':-1
+          }
+          let gatewayData = await selectDevice(devicewg);
+          console.log(11111111)
+          console.log(gatewayData)
+          let offFhildren = [];
+          let onChildren = [];
+          gatewayData.rows.forEach(element =>{
+            if(element.statusId == 1){
+                console.log(element)
+                offFhildren.push(element.id)
+                // data2[0].children[0].children[0].num = offarr.length;
+                // gatewayTotal = gatewayTotal+gatewayData.rows.length;
+            }
+            else if(element.statusId == 0){
+                onChildren.push(element.id)
+                // data2[0].children[0].children[1].num = gatewayData.rows.length;
+                // gatewayTotal = gatewayTotal+gatewayData.rows.length;
+            }
+        })
+        console.log(offFhildren.length);
+        data2[0].children[0].children[1].num = offFhildren.length;
+        data2[0].children[0].children[0].num = onChildren.length;
+        data2[0].children[0].num = gatewayData.rows.length;
+        console.log(gatewayTotal)
+        let endpointTotal = 0;
+        let devicezd = {
+            'pageSize':currentNum,
+            'pageNum':everyNum,
+            'type':1,
+            'deviceGroupId':-1,
+            'statusId':-1
+          }
+        let endpointData = await selectDevice(devicezd);
+        console.log(22222)
+        console.log(endpointData)
+        let online = [];
+        let offline = [];
+        let guline = [];
+        endpointData.rows.forEach(element =>{
+        if(element.statusId == 0){//在线
+            online.push(element.id)
+            // data2[0].children[1].children[0].num = endpointData.rows.length;
+            // endpointTotal = endpointTotal+endpointData.rows.length;
+        }
+        else if(element.statusId == 1){//离线
+            offline.push(element.id)
+            // data2[0].children[1].children[1].num = endpointData.rows.length;
+            // endpointTotal = endpointTotal+endpointData.rows.length;
+        }
+        else if(element.statusId == 2){//故障
+            guline.push(element.id)
+            // data2[0].children[1].children[2].num = endpointData.rows.length;
+            // endpointTotal = endpointTotal+endpointData.rows.length;
+        }
+        })
+        data2[0].children[1].children[0].num = online.length; 
+        data2[0].children[1].children[1].num = offline.length; 
+        data2[0].children[1].children[2].num = guline.length; 
+        data2[0].children[1].num = endpointData.rows.length;
+        data2[0].num =gatewayData.rows.length + endpointData.rows.length;
+        console.log(endpointTotal)
       },
       //分页
       handleSizeChange(val) {
@@ -773,11 +855,11 @@ export default {
     },
     async getTreeGroup(){
           let grouptreeData = await getGroup();
-          console.log(grouptreeData);
+          // console.log(grouptreeData);
           let that = this;
           that.data5[0].children = grouptreeData.rows;
-          console.log(that.data5)
-          console.log(that.data5[0].children)
+          // console.log(that.data5)
+          // console.log(that.data5[0].children)
       },
     //确定添加
     async sureAdd(addNetwork){
@@ -906,20 +988,26 @@ export default {
         console.log(scope);
       },
     //删除
-    mangedelete(scope){
-        let that = this;
-        console.log(scope);
-        that.deluuid = scope.uuid;
-        that.delid = scope.id;
-        that.deleteDevicedialogVisible = true;
+    mangedelete (data) {
+        let that = this
+        this.$confirm('此操作将删除本设备, 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+           that.sureDeleteDevice(data)
+        }).catch(() => {
+           console.log('取消了删除')
+       })
       },
-    async sureDeleteDevice(){
+
+    async sureDeleteDevice(scope){
         let that = this;
         let deluuID =  that.deluuid;
         let delId = that.delid;
         let delData = {
-          'uuid':deluuID,
-          'id':delId,
+          'uuid':scope.uuid,
+          'id':scope.id,
         }
         let delsj = await delDevice(delData);
         console.log(delsj)
@@ -1329,28 +1417,52 @@ export default {
         data2: [{
           id: 2,
           label: '所有设备',
+          type: -1,
+          state: -1,
+          num: 0,
           children: [{
             id: 0,
             label: '网关设备',
+            type: 0,
+            state: -1,
+            num: 0,
             children: [{
               id: 3,
-              label: '在线'
+              label: '在线',
+              type: 0,
+              state: 1,
+              num: 0,
             }, {
               id: 4,
-              label: '离线'
+              label: '离线',
+              type: 0,
+              state: 2,
+              num: 0,
             }]
           },{
             id: 1,
             label: '终端设备',
+            type: 1,
+            state: -1,
+            num: 0,
             children: [{
               id: 5,
-              label: '在线'
+              label: '在线',
+              type: 1,
+              state: 1,
+              num: 0,
             }, {
               id: 6,
-              label: '离线'
+              label: '离线',
+              type: 1,
+              state: 2,
+              num: 0,
             },{
               id: 7,
-              label: '故障'
+              label: '故障',
+              type: 1,
+              state: 3,
+              num: 0,
             }]
           }]
         }],
@@ -1514,4 +1626,21 @@ export default {
    display: inline-block;
     margin: 0 20px !important;
 }
+ .num-tag {
+        color: #fff;
+        background: #99a9bf;
+        padding: 3px 10px;
+        font-size: 12px;
+        line-height: 12px;
+        border-radius: 20px;
+        text-align: center;
+    }
+  .custom-tree-node {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 14px;
+      padding-right: 18px;
+  }
 </style>

@@ -94,7 +94,7 @@ export default {
       // localStorage.setItem('userType', userdata.data.userType);
       console.log(4444)
       localStorage.setItem('user', JSON.stringify(userdata.data));
-      that.$router.push({ path: '/' })
+      that.$router.push({ path: '/info' })
     },
     handleLogin() {
       const that = this

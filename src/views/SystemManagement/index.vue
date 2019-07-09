@@ -59,8 +59,8 @@
                                 >
                                 <template slot-scope="scope">
                                     <el-button-group>
-                                    <el-button @click="userDetail(scope.row)" type="text"  size="small">查看</el-button>
-                                    <el-button @click="usedelete(scope.row)" type="text"  size="small">|删除</el-button>
+                                    <el-button @click="userDetail(scope.row)" type="primary"  icon="el-icon-info"  size="small">查看</el-button>
+                                    <el-button @click="usedelete(scope.row)" type="danger"  icon="el-icon-delete"  size="small">删除</el-button>
                                     </el-button-group>
                                 </template>
                                 </el-table-column>
@@ -133,8 +133,8 @@
                                 >
                                 <template slot-scope="scope">
                                     <el-button-group>
-                                    <!-- <el-button @click="roleDetail(scope.row)" type="text"  size="small">查看|</el-button> -->
-                                    <el-button @click="roleDel(scope.row)" type="text"  size="small">删除</el-button>
+                                    <el-button @click="roleDetail(scope.row)" type="primary" icon="el-icon-info"  size="small">查看</el-button>
+                                    <el-button @click="roleDel(scope.row)" type="danger"  icon="el-icon-delete"  size="small">删除</el-button>
                                     </el-button-group>
                                 </template>
                                 </el-table-column>  
@@ -216,7 +216,7 @@
                                 >
                                 <template slot-scope="scope">
                                     <el-button-group>
-                                    <el-button @click="eventDetail(scope.row)" type="text"  size="small">查看</el-button>
+                                    <el-button @click="eventDetail(scope.row)" type="primary" icon="el-icon-info" size="small">查看</el-button>
                                     </el-button-group>
                                 </template>
                                 </el-table-column>
@@ -292,7 +292,7 @@
                                 width="200"
                                 >
                                 <template slot-scope="scope">
-                                    <el-button @click="systemLogDetail(scope.row)" type="text"  size="small">查看</el-button>       
+                                    <el-button @click="systemLogDetail(scope.row)" type="primary" icon="el-icon-info"   size="small">查看</el-button>       
                                 </template>
                                 </el-table-column>
                             </el-table>
@@ -639,12 +639,22 @@ export default {
         let that = this;
         that.getdatetime();//获取时间
         that.getuserList();//获取用户列表
+        that.getallRole();
+        that.getAllEcent();
+        that.getAllSystemLog();
+        let sysactivetab = localStorage.getItem('sysactivetab');
+        if(!sysactivetab){
+             this.activeName = 'one'
+        }else{
+             this.activeName = sysactivetab;
+        }
     },
     methods: {
         //点击左侧导航事件
         handleClick(tab, event) {
             let that = this;
             console.log(tab.paneName);
+            localStorage.setItem('sysactivetab', tab.paneName);
             console.log(event)
             if(tab.paneName == 'one'){
                 console.log('用户列表')
@@ -881,16 +891,22 @@ export default {
             that.userInfo.loginNum = scope.loginNum;
         },
         //用户删除
-        usedelete(scope){
-            console.log(scope);
-            let that = this;
-            that.userDelid = scope.id;
-            that.deleteUserdialogVisible = true;
+        usedelete (data) {
+            let that = this
+            this.$confirm('此操作将删除一个用户, 是否继续?', '提示', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning'
+            }).then(() => {
+            that.sureDeleteUser(data)
+            }).catch(() => {
+            console.log('取消了删除')
+          })
         },
-        async sureDeleteUser(){
+        async sureDeleteUser(scope){
             let that = this;
             let delData = {
-                'id':that.userDelid
+                'id':scope.id
             };
             let delsj = await delUser(delData);
             console.log(delsj)
@@ -1061,16 +1077,22 @@ export default {
             console.log(scope);
         },
         //角色删除
-        roleDel(scope){
-            console.log(scope);
-            let that = this;
-            that.deleteRoledialogVisible = true;
-            that.deleteRoledid = scope.id;
+        roleDel (data) {
+            let that = this
+            this.$confirm('此操作将删除一个角色, 是否继续?', '提示', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning'
+            }).then(() => {
+            that.sureDeletejs(data)
+            }).catch(() => {
+            console.log('取消了删除')
+          })
         },
-        async sureDeletejs(){
+        async sureDeletejs(scope){
             let that = this;
             let delRoleData = {
-                'id':that.deleteRoledid
+                'id':scope.id
             };
             console.log(delRoleData)
             let delsj = await delRole(delRoleData);

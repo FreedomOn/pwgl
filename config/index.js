@@ -12,7 +12,7 @@ module.exports = {
     assetsPublicPath: '/',
     proxyTable: {
       '/wlsbgl': {
-          target: 'http://192.168.1.112:8080/wlsbgl', // 乔威
+          target: 'http://192.168.1.107:8080/wlsbgl', // 乔威
           changeOrigin: true,
           pathRewrite: {                //需要rewrite重写的, 如果在服务器端做了处理则可以不要这段
             '^/wlsbgl': ''
