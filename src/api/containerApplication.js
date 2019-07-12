@@ -1,6 +1,23 @@
 import request from '@/utils/request'
 import qs from 'qs'
 
+//部署管理页面查询数据
+export const selectDeploy= (deploySelectData) => {
+    return new Promise((resolve,reject) =>{
+        request({
+            method:'post',
+            url:'/wlsbgl/host/getAllHostDevice',
+            data: qs.stringify(deploySelectData)  //将传递的参数变为字符形式
+          })
+           .then((res) => {
+               resolve(res.data)
+           })
+           .catch((err) => {
+               console.log(err);
+               reject(err)
+           })
+    })
+}
 //镜像查询数据
 export const selectMirring = (selectData) => {
     return new Promise((resolve,reject) =>{

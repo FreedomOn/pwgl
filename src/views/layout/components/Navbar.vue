@@ -10,9 +10,9 @@
         <el-menu-item index="/info">概要信息</el-menu-item>
         <el-menu-item index="/bushu">部署总览</el-menu-item>
         <el-menu-item index="/deviceMange">设备管理</el-menu-item>
-         <el-menu-item index="/configurationInformation">配置信息</el-menu-item>
-          <el-menu-item index="/containerApplication">容器应用</el-menu-item>
-          <el-menu-item index="/SystemManagement">系统管理</el-menu-item>
+        <el-menu-item index="/configurationInformation">配置管理</el-menu-item>
+        <el-menu-item index="/containerApplication">容器应用</el-menu-item>
+        <el-menu-item index="/SystemManagement">系统管理</el-menu-item>
 </el-menu>
 <div class="line"></div>
     </div>

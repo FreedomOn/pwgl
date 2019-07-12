@@ -12,10 +12,10 @@
         :props="defaultProps"
         >
          <span class="custom-tree-node" slot-scope="{ node, data }">
-                      <span>{{ node.label }}</span>
-                      <span>
-                              <a class="num-tag">{{data.num}}</a>
-                      </span>
+            <span>{{ node.label }}</span>
+            <span>
+                <a class="num-tag">{{data.num}}</a>
+            </span>
           </span>
       </el-tree>
       <el-tree
@@ -32,11 +32,43 @@
     <div class="body">
       <div class="header">
          <span>
-          <el-button type="primary" size='small' @click="facilityAdd()">设备添加</el-button>
-          <el-button type="primary" size='small' @click="groupAdd()">分组添加</el-button>
-          <el-button type="primary" size='small' @click="modelDaochu()">模板导出</el-button>
-          <el-button type="primary" size='small' @click="excelDaocru()" >设备导入</el-button>
-          <el-button type="primary" size='small' @click="excelDaochu()">设备导出</el-button>
+           <el-dropdown  trigger="click"   @command="monhandleCommand">
+                <el-button type="primary" size='medium'  >
+                    设备操作<i class="el-icon-arrow-down el-icon--right"></i>
+                </el-button>
+                <el-dropdown-menu slot="dropdown">
+                    <el-dropdown-item command="aa">
+                        设备添加
+                    </el-dropdown-item>
+                    <el-dropdown-item command="bb">    
+                        设备导入
+                    </el-dropdown-item>
+                    <el-dropdown-item command="cc">
+                        设备导出
+                    </el-dropdown-item>
+                    <el-dropdown-item command="dd">
+                        设备模板下载
+                    </el-dropdown-item>
+                </el-dropdown-menu>
+            </el-dropdown>
+          <!-- <el-button type="primary" size='small' @click="facilityAdd()">设备添加</el-button> -->
+          <el-button type="primary" size='medium' @click="groupAdd()">分组添加</el-button>
+          <!-- <el-button type="primary" size='small' @click="modelDaochu()">模板导出</el-button> -->
+          <!-- <el-button type="primary" size='small' @click="excelDaocru()" >设备导入</el-button> -->
+          <!-- <el-button type="primary" size='small' @click="excelDaochu()">设备导出</el-button> -->
+          <el-dropdown  trigger="click"   @command="piliangmonhandleCommand">
+                <el-button type="primary" size='medium'  >
+                    批量操作<i class="el-icon-arrow-down el-icon--right"></i>
+                </el-button>
+                <el-dropdown-menu slot="dropdown">
+                    <el-dropdown-item command="aaa">
+                        批量重启
+                    </el-dropdown-item>
+                    <el-dropdown-item command="bbb">    
+                        批量停止
+                    </el-dropdown-item>
+                </el-dropdown-menu>
+            </el-dropdown>
         </span> 
         <span class="span1">
           <el-input v-model="selsctInput"  placeholder="请输入搜索内容" style="width:400px;border-radius: 30px"></el-input>
@@ -61,34 +93,35 @@
           <el-table-column
             prop="name"
             label="设备名"
-            width="120">
+            width="110">
           </el-table-column>
           <el-table-column
             prop="statesdata"
             label="类型"
-            width="120"
+            width="100"
            >
           </el-table-column>
            <el-table-column
             prop="firmwareVersion"
             label="版本"
-             width="90"
+             width="80"
             >
           </el-table-column>
            <el-table-column
             prop="devstate"
             label="状态"
-             width="90"
+             width="80"
             >
           </el-table-column>
            <el-table-column
             prop="updateTime"
-             width="170"
+             width="180"
             label="更新时间"
             >
           </el-table-column>
           <el-table-column
-            prop=""
+            prop="model"
+            width="120"
             label="型号">
           </el-table-column>
             <el-table-column
@@ -222,7 +255,15 @@
             <el-row>
               <el-col :span="12">
                   <el-form-item label="容器版本" prop='container'>
-                  <el-input v-model="addNetwork.container" clearable :disabled="vrnoclick" placeholder="请输入..." style="width:300px"></el-input>
+                  <!-- <el-input v-model="addNetwork.container" clearable :disabled="vrnoclick" placeholder="请输入..." style="width:300px"></el-input> -->
+                    <el-select v-model="addNetwork.container" filterable :disabled="vrnoclick" placeholder="请选择" style="width:300px">
+                      <el-option
+                        v-for="item in conOptions"
+                        :key="item.id"
+                        :label="item.version"
+                        :value="item.id">
+                      </el-option>
+                    </el-select>
                   </el-form-item> 
               </el-col>
           </el-row>
@@ -318,7 +359,15 @@
             <el-row>
               <el-col :span="12">
                   <el-form-item label="容器版本" prop='container'>
-                  <el-input v-model="updateNetwork.container" clearable :disabled="updatenoclick" placeholder="请输入..." style="width:300px"></el-input>
+                    <!-- <el-input v-model="updateNetwork.container" clearable :disabled="updatenoclick" placeholder="请输入..." style="width:300px"></el-input> -->
+                     <el-select v-model="updateNetwork.container" filterable :disabled="updatenoclick" placeholder="请选择" style="width:300px">
+                      <el-option
+                        v-for="item in updateOptions"
+                        :key="item.id"
+                        :label="item.version"
+                        :value="item.id">
+                      </el-option>
+                    </el-select>
                   </el-form-item> 
               </el-col>
           </el-row>
@@ -483,6 +532,32 @@ export default {
     this.getnum();
   },
   methods: {
+    //设备按钮组操作
+     monhandleCommand(command) {
+        let that = this;
+        console.log(command);
+        if(command == 'aa'){
+          console.log('设备添加')
+          that.facilityAdd();
+        }else if(command == 'bb'){
+          that.excelDaocru();
+          console.log('设备导入')
+        }else if(command == 'cc'){
+          console.log('设备导出')
+          that.excelDaochu();
+        }else if(command == 'dd'){
+          console.log('设备模板下载')
+          that.modelDaochu();
+        }
+     },
+     //批量按钮组操作
+     piliangmonhandleCommand(command){
+       if(command == 'aaa'){
+          console.log('批量重启')
+        }else if(command == 'bbb'){
+          console.log('批量停止')
+        }
+     },
     //获取所有设备
     async getData () {
       let that = this;
@@ -595,12 +670,13 @@ export default {
             // endpointTotal = endpointTotal+endpointData.rows.length;
         }
         })
+        console.log(offFhildren.length);
         data2[0].children[1].children[0].num = online.length; 
         data2[0].children[1].children[1].num = offline.length; 
         data2[0].children[1].children[2].num = guline.length; 
         data2[0].children[1].num = endpointData.rows.length;
         data2[0].num =gatewayData.rows.length + endpointData.rows.length;
-        console.log(endpointTotal)
+        console.log(offline)
       },
       //分页
       handleSizeChange(val) {
@@ -614,7 +690,7 @@ export default {
         let that = this;
         that.currentPage = val;
         that.loading = true;
-        that.getData();
+        that.getTreeData();
       },
       //左侧树  所有设备点击事件
      handleNodeClick(data) {
@@ -808,6 +884,7 @@ export default {
             });
        }
       },
+    
     //设备添加
     async facilityAdd(){
         let that = this;
@@ -827,7 +904,24 @@ export default {
         that.addNetwork.checked = false;
         that.vrnoclick = true;
         that.getdatetime();
+        that.getAllConVer();
       },
+    //获取所有容器版本数据
+    getAllConVer(){
+      let that = this;
+       that.$axios({
+          method:'post',
+          url:'/wlsbgl/hostGroup/gethostGroupName',
+          })
+          .then((res)=>{
+              console.log(res)
+              that.conOptions = res.data.rows;
+              that.updateOptions = res.data.rows;
+          })
+          .catch((err)=>{
+              console.log(err);
+      })
+    },
     //获取时间
     async getdatetime(){
         let that = this;
@@ -897,8 +991,9 @@ export default {
         'lng':wdPostion,
         'description':description,
         'hardwareInfo':yingInfo,
-        'containerVersion':contentVr,
+        'containerVersion':'',
         'deviceGroupId':fenGroup,
+        'hostGroupId':contentVr,
         }
         let param = {
           'param':JSON.stringify(addData),
@@ -958,16 +1053,16 @@ export default {
         that.activeName = 'first';
         that.basicInfo.uuid = scope.uuid;
         that.basicInfo.deviceNum = '';//设备编号
-        that.basicInfo.orderNum = ''; //序列号
+        that.basicInfo.orderNum = scope.sn; //序列号
         let devicetype = scope.type;
         if(devicetype == 0){
           that.basicInfo.deviceType = '网关设备'
         }else if(devicetype == 1){
           that.basicInfo.deviceType = '终端设备'
         }
-        that.basicInfo.state  = '';//状态
+        that.basicInfo.state  = scope.devstate;//状态
         that.basicInfo.position = '经度：'+scope.lat +'   ' + '维度：'+scope.lng;
-        that.basicInfo.startTime = '';//开始时间
+        that.basicInfo.startTime = scope.lastUpTime;//开始时间
         that.basicInfo.updateTime = scope.updateTime;
         that.basicInfo.firmware = scope.firmwareVersion;
         that.basicInfo.desc = scope.description;
@@ -1038,10 +1133,10 @@ export default {
             </span>
           </span>);
     },
-    async remove(){
-      let that = this;
-      that.deletedialogVisible = true;
-    },
+    // async remove(){
+    //   let that = this;
+    //   that.deletedialogVisible = true;
+    // },
     //弹窗关闭事件
     handleClose(done) {
             done();
@@ -1081,10 +1176,12 @@ export default {
       that.updateNetwork.weidu = scope.lng;//维度
       that.updateNetwork.textarea = scope.description;//描述
       that.updateNetwork.hardware = scope.hardwareInfo;//硬件信息
+      that.updateNetwork.container = scope.id;//容器版本
       that.updateNetwork.uuid = scope.uuid;
       console.log(that.updateNetwork.groupid,that.updateNetwork.value)
       //还差一个容器版本
       that.getdatetime();
+      that.getAllConVer();
     },
     updatechangesel(key){
       let that = this;
@@ -1130,11 +1227,13 @@ export default {
         'lng':wdPostion,
         'description':description,
         'hardwareInfo':yingInfo,
-        'containerVersion':contentVr,
+        'containerVersion':'',
         'deviceGroupId':fenGroup,
+        'hostGroupId':contentVr
         }
         let param = {
           'param':JSON.stringify(updateData),
+          
         }
         let updatesj = await updateDevice(param);
         console.log(updatesj)
@@ -1187,11 +1286,23 @@ export default {
           }
     },
     //分组删除
+    remove (data) {
+        let that = this
+        this.$confirm('此操作将删除一条分组, 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+           that.sureDeleteGroup(data)
+        }).catch(() => {
+           console.log('取消了删除')
+       })
+      },
     async sureDeleteGroup(){
         let that = this;
-        let delId =  that.deleteGroupId;
+        // let delId =  that.deleteGroupId;
         let delGroupData = {
-          'id':delId
+          'id':that.deleteGroupId
         }
         that.deletedialogVisible = false;
         let aaa = await deleteGroup(delGroupData);
@@ -1482,6 +1593,7 @@ export default {
         loading:true,
         multipleSelection: [],
         adddialogVisible:false,
+        conOptions:[],
         detailDialogVisible:false,
         deletedialogVisible:false,
         deleteGroupId:-1,
@@ -1525,6 +1637,7 @@ export default {
         delid:'',
         deleteDevicedialogVisible:false,
         updatedialogVisible:false,
+        updateOptions:[],
         updateNetwork:{
           groupid:'',
           uuid:'',

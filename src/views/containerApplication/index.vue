@@ -20,43 +20,43 @@
                                 v-loading="deployloading"
                                 element-loading-text="拼命加载中">
                                 <el-table-column
-                                prop="date"
+                                prop="device.name"
                                 label="容器名称"
                                 width="180">
                                 </el-table-column>
                                 <el-table-column
-                                prop="name"
+                                prop="statesdata"
                                 label="所属设备"
-                                width="100">
+                                width="140">
                                 </el-table-column>
                                 <el-table-column
-                                prop="date"
+                                prop="device.hostGroup.version"
                                 label="容器版本"
                                 width="150">
                                 </el-table-column>
                                 <el-table-column
-                                prop="date"
+                                prop="devstate"
                                 label="状态"
-                                width="150">
+                                width="140">
                                 </el-table-column>
                                 <el-table-column
-                                prop="name"
+                                prop="appNum"
                                 label="应用数量"
-                                width="80">
+                                width="140">
                                 </el-table-column>
                                 <el-table-column
-                                prop="name"
+                                prop="lastUpTime"
                                 label="启动时间">
                                 </el-table-column>
                                 <el-table-column
                                 fixed="right"
                                 label="操作"
-                                width="200"
+                                width="280"
                                 >
                                 <template slot-scope="scope">
                                     <el-button-group>
                                     <el-button @click="deployDetail(scope.row)" type="info" icon="el-icon-info" size="small">查看</el-button>
-                                    <el-button @click="deployReload(scope.row)" type="primary" icon="el-icon-refresh" size="small">重启</el-button>
+                                    <el-button @click="deployReload(scope.row)" type="danger"    icon="el-icon-refresh" size="small">重启</el-button>
                                     <el-button @click="applicationDeployment(scope.row)" type="primary" icon="el-icon-setting" size="small">应用部署</el-button>
                                     <!-- <el-button @click="mangedelete(scope.row)" type="text"  size="small">|删除</el-button>
                                     <el-button @click="mangeupdate(scope.row)" type="text"  size="small">|编辑</el-button> -->
@@ -341,7 +341,7 @@
     </div>
 </template>
 <script>
-import { selectMirring,applyAdd,applySelectapply,delDevice,delApplyDevice} from '@/api/containerApplication'
+import { selectDeploy,selectMirring,applyAdd,applySelectapply,delDevice,delApplyDevice} from '@/api/containerApplication'
 export default {
   data() {
       return {
@@ -365,11 +365,7 @@ export default {
         bushutotal:1,
         applyAdd:false,//应用添加按钮
         ImageUpload:false,//镜像上传按钮
-        deployTableData: [{
-          date: '2016-05-02',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄'
-        }],
+        deployTableData: [],
         applyTableData:[],
         mirroringTableData:[],
         mirroringDialogVisible:false,
@@ -420,6 +416,7 @@ export default {
         that.getAllContail();
         that.getApplyData();
         that.getMirroringData();
+        that.getbushuData();
         let activetab = localStorage.getItem('activetab');
         if(!activetab){
              this.activeName = 'one'
@@ -444,6 +441,7 @@ export default {
                  that.getMirroringData();//获取镜像信息数据
             }else if(tab.paneName == 'one'){
                 console.log('部署管理')
+                that.getbushuData();
             }
         },
         handleClose(done) {
@@ -488,13 +486,61 @@ export default {
             that.deployloading = true;
             that.getbushuData();
         },
-        //获取所有部署数据
-        getbushuData:function(){
-            
+        //获取所有部署数据 以及查询数据
+        async getbushuData(){
+            let that = this;
+            let currentNum = that.bushucurrentPage;
+            let everyNum = that.bushuPageSize;   
+            let selcontent =  that.selsctInput;
+            let deploySelectData = {
+                'pageSize':currentNum,
+                'pageNum':everyNum,
+                'name':selcontent == undefined ? "":selcontent,
+            }
+            let deploydata = await selectDeploy(deploySelectData) 
+            console.log(deploydata)
+            that.deployloading = false;
+            if(deploydata.status == '200'){
+            let arr = deploydata.rows;
+            let newArr = [];
+            arr.forEach(element =>{
+                let i = element.device.type;
+                let j = element.device.statusId;
+                if(j == 0){
+                element.devstate = '在线'
+                }else if(j == 1){
+                element.devstate = '离线'
+                }else if(j == 2){
+                element.devstate = '故障'
+                }
+                if (i == 0) {
+                    element.statesdata = "网关设备"
+                }else if(i==1){
+                    element.statesdata = "终端设备"
+                }
+                newArr.push(element)
+            })
+            // console.log(newArr)
+            this.deployTableData = newArr;
+            this.bushutotal = deploydata.total;
+            }
         },
         //部署容器快速搜索
-        deploySelect(){
-
+        async deploySelect(){
+           let that = this;
+           that.getbushuData();
+        },
+        //部署详情
+        deployDetail(scope){
+            console.log(scope);
+        },
+        //部署管理重启
+        deployReload(scope){
+            console.log(scope);
+        },
+        //部署管理 应用部署
+        applicationDeployment(scope){
+            console.log(scope);
         },
         //获取所有容器和id
         getAllContail(){

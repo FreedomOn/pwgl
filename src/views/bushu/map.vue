@@ -2,9 +2,9 @@
 <template>
   <div class="page">   
     <div class="header">
-        <div class="header_left">
+        <!-- <div class="header_left">
             <span>地图工具</span>
-        </div>
+        </div> -->
         <div class="header_right">
             <el-input v-model="selsctInput"  placeholder="请输入设备名字进行搜索" style="width:400px"></el-input>
             <el-button type="primary" icon="el-icon-search"   @click="select()">快速搜索</el-button>
@@ -77,7 +77,7 @@
               'offset':[-2,-45],
               'markderclick':{
                 click: (id) => {
-                console.log(id);
+                 console.log(ele.id);
                 },
               }
             })
@@ -117,12 +117,9 @@
 }
 .header{
     width: 100%;
-    height: 10%;
-    background: #f1f1f1
-}
-.header_left{
-    float: left;
-    margin: 18px 31px;
+    height: 7%;
+    /* background: #f1f1f1 */
+    margin-bottom: 5px 
 }
 .header_right{
     float: right;
@@ -132,5 +129,6 @@
 .amap-wrapper {
   width: 100%;
   height: 90%;
+  
 }
 </style>

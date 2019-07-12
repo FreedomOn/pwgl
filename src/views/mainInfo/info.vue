@@ -1,11 +1,110 @@
 <template>
   <div class="dashboard-container">
-    <div class="dashboard-bg" style="padding:20px">
+    <!-- <div class="dashboard-bg" style="padding:20px">
        <div class="dashboard-text">欢迎您:{{name}}  
+        </div>
+    </div> -->
+    <div class="dashboard-bg">
+        <div class="con_top_lrft">
+            <div class="con_top_lrft_top">
+                当前设备统计：
+            </div>
+            <div  class="con_top_buttom">
+                <div class="con_top_left_left">
+                    <ve-pie :data="piechartData" :settings="piechartSettings" height=300px></ve-pie>
+                    <p>设备类型</p>
+                </div>
+                <div class="con_top_left_right">
+                    <ve-pie :data="piechartDataGroup" :settings="piechartSettingsGroup" height=300px ></ve-pie>
+                    <p>设备分组</p>
+                </div>
+            </div>
+           
+        </div>
+        <div class="con_top_middle">
+            <div class="con_top_middle_top">
+                容器状态统计：
+            </div>
+            <div class="con_top_middle_content">
+                <ve-histogram :data="histchartData" :settings="histchartSettings"  :extend="extend" height=300px></ve-histogram>
+            </div>
+        </div>
+        <div class="con_top_right">
+            <div class="con_top_right_top">
+                应用统计
+            </div>
+            <div class="con_top_right_bottom">
+                <p>-镜像数量({{mirrNum}})</p>
+                <p>-应用数量({{applyNum}}})</p>
+                <p>-容器设备数量({{deviceNum}})</p> 
+            </div> 
         </div>
     </div>
     <div class="dashboard-bg">
-      <!-- <ve-histogram :data="chartData"></ve-histogram> -->
+         <div class="con_mid_lrft">
+            <div class="con_mid_lrft_top">
+                设备数量趋势：
+            </div>
+            <div class="con_mid_left_buttom">
+                 <ve-line :data="deviceLineChartData" :extend="deviceextend" :settings="deviceLineChartSettings" height=300px></ve-line>
+            </div>
+            <div class="con_mid_left_time">
+                <el-date-picker
+                    v-model="deviceValue"
+                    @change="deviceSelTime"
+                    type="daterange"
+                    align="right"
+                    value-format="yyyy-MM-dd"
+                    range-separator="至"
+                    start-placeholder="开始日期"
+                    end-placeholder="结束日期"
+                    :picker-options="pickerOptions">
+                </el-date-picker>
+            </div>   
+        </div>
+        <div class="con_mid_middle">
+            <div class="con_mid_middle_top">
+                设备状态趋势：
+            </div>
+            <div class="con_mid_middle_content">
+                 <ve-line :data="deviceTypeLineChartData" :extend="deviceTypeextend" :settings="deviceTypeLineChartSettings" height=300px></ve-line>
+                 <!-- <ve-line :data="chartData" :settings="chartSettings" :extend="deviceTypeextend" height=300px>></ve-line> -->
+                  <div class="con_mid_middle_time">
+                    <el-date-picker
+                        v-model="deviceTypeValue"
+                        @change="deviceTypeSelTime"
+                        type="daterange"
+                        align="right"
+                        value-format="yyyy-MM-dd"
+                        range-separator="至"
+                        start-placeholder="开始日期"
+                        end-placeholder="结束日期"
+                        :picker-options="pickerOptions">
+                    </el-date-picker>
+                </div>   
+            </div>
+        </div>
+        <div class="con_mid_right">
+            <div class="con_mid_right_top">
+                使用统计
+            </div>
+            <div class="con_mid_right_bottom">
+                <p>-电表应用({{electricNum}})</p>
+                <p>-安全应用({{safeNum}})</p> 
+                <p>-转换应用({{transitionNum}})</p>  
+            </div>  
+        </div>
+    </div>
+    <div class="bottom_bon_all">
+        <div class="bottom_title">
+            重要事件通知    
+        </div>
+        <div class="bottom_content">
+            <ul v-for="(item,index) in info" :key="index">
+                <li>{{item.name}}</li>
+            </ul>
+        </div>
+        
     </div>
   </div>
 </template>
@@ -13,28 +112,155 @@
 <script>
 import { mapGetters } from 'vuex'
 
-
 export default {
-  name: 'dashboard',
+  name: 'dashboard',    
   mounted() {
     
   },
   methods: {
-    
+      //设备数量趋势选择时间段
+    deviceSelTime(value){
+        // console.log(value);
+        console.log(this.deviceValue);
+    },
+    deviceTypeSelTime(value){
+        console.log(this.deviceTypeValue)
+    }
   },
-  data () {
-    return {
-      chartData: {
-          columns: ['日期', '访问用户', '浏览人数', ],
-          rows: [
-            { '日期': '1/1', '访问用户': 1393, '浏览人数': 1093,  },
-            { '日期': '1/2', '访问用户': 3530, '浏览人数': 3230,  },
-            { '日期': '1/3', '访问用户': 2923, '浏览人数': 2623,  },
-            { '日期': '1/4', '访问用户': 1723, '浏览人数': 1423,  },
-            { '日期': '1/5', '访问用户': 3792, '浏览人数': 3492,  },
-            { '日期': '1/6', '访问用户': 4593, '浏览人数': 4293,  }
-          ]
+  data () {  
+    //设备类型扇形图
+    this.piechartSettings = {
+      dimension: '设备类型',
+      metrics: '设备个数',
+      radius: 60,
+      offsetY:140
+    }
+    //设备分组山西图
+    this.piechartSettingsGroup = {
+      dimension: '设备分组',
+      metrics: '设备个数',
+      radius: 60,
+      offsetY:140
+    }
+    //容器状态统计柱状图
+    this.histchartSettings = {
+      metrics: ['在线', '离线', '故障'],
+       dimension: ['容器状态']
+    }
+    //容器状体 柱状图 显示具体条数设置
+    this.extend = {
+        series: {
+            label: { show: true, position: "top" }
         }
+    }
+    //设备数量趋势横坐标以time类型显示 纵坐标显示表头数量
+    this.deviceLineChartSettings = {
+       xAxisType: 'time',
+       yAxisName: ['数量',],
+    }
+    //设备状态趋势横坐标以time类型显示 纵坐标显示表头数量
+    this.deviceTypeLineChartSettings = {
+       xAxisType: 'time',
+       yAxisName: ['数量',],
+    }
+    //设置时间显示旋转45度
+    this.deviceextend = {
+        'xAxis.0.axisLabel.rotate': 45
+    },
+    this.deviceTypeextend = {
+        'xAxis.0.axisLabel.rotate': 45
+    }
+    return {
+      //设备类型数据
+      piechartData: {
+            columns: ['网管设备', '终端设备'],
+            rows: [
+                { '设备类型': '网管设备', '设备个数': 1393 },
+                { '设备类型': '终端设备', '设备个数': 3530 },
+            ]
+        },
+      //设备分组数据
+       piechartDataGroup: {
+            columns: ['东区', '南区','西区','北区'],
+            rows: [
+            { '设备分组': '东区', '设备个数': 1393 },
+            { '设备分组': '南区', '设备个数': 3530 },
+            { '设备分组': '西区', '设备个数': 2530 },
+            { '设备分组': '北区', '设备个数': 4530 },
+            ]
+        },
+        //容器状态统计数据
+        histchartData: {
+            columns: [ '在线', '离线', '故障'],
+            rows: [
+            { '容器状态':'', '在线': 13, '离线': 15, '故障': 32 },
+            ]
+        },
+        //设备数量趋势数据
+        deviceLineChartData: {
+            columns: ['日期', '网管设备', '终端设备', ],
+            rows: [
+                { '日期': '2018-01-01', '网管设备': 1393, '终端设备': 1093, },
+                { '日期': '2018-01-02', '网管设备': 3530, '终端设备': 3230, },
+                { '日期': '2018-01-03', '网管设备': 2923, '终端设备': 2623, },
+                { '日期': '2018-01-05', '网管设备': 1723, '终端设备': 1423, },
+                { '日期': '2018-01-10', '网管设备': 3792, '终端设备': 3492, },
+                { '日期': '2018-02-20', '网管设备': 4593, '终端设备': 4293, }   
+            ]
+        },
+        //设备状态趋势数据
+        deviceTypeLineChartData:{
+           columns: ['日期', '在线', '离线', '故障'],
+            rows: [
+            { '日期': '2018-01-01', '在线': 1393, '离线': 1093, '故障': 1121 },
+            { '日期': '2018-01-02', '在线': 3530, '离线': 3230, '故障': 2122 },
+            { '日期': '2018-01-03', '在线': 2923, '离线': 2623, '故障': 2222 },
+            { '日期': '2018-01-05', '在线': 1723, '离线': 1423, '故障': 3213 },
+            { '日期': '2018-01-10', '在线': 3792, '离线': 3492, '故障': 1231 },
+            { '日期': '2018-01-20', '在线': 4593, '离线': 4293, '故障': 4212 }
+            ]
+        },
+        //时间选择
+          pickerOptions: {
+            shortcuts: [{
+                text: '最近一周',
+                onClick(picker) {
+                const end = new Date();
+                const start = new Date();
+                start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
+                picker.$emit('pick', [start, end]);
+                }
+            }, {
+                text: '最近一个月',
+                onClick(picker) {
+                const end = new Date();
+                const start = new Date();
+                start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
+                picker.$emit('pick', [start, end]);
+                }
+            }, {
+                text: '最近三个月',
+                onClick(picker) {
+                const end = new Date();
+                const start = new Date();
+                start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
+                picker.$emit('pick', [start, end]);
+                }
+            }]
+        },
+        deviceValue:'',
+        deviceTypeValue:'',
+        mirrNum:10,//镜像数量 
+        applyNum:20,//应用数量
+        deviceNum:30,// 容器设备数量
+        electricNum:11,//电表应用
+        safeNum:22,// 安全应用
+        transitionNum:33,// 转换应用 
+        info:[
+          { name: 'Runoob' },
+          { name: 'Google' },
+         { name: 'Taobao' }
+        ],//重要事件通知
     }
   },
   computed: {
@@ -114,5 +340,131 @@ $bordercolor: rgb(19, 7, 87);
     }
   }
 }
-
+.dashboard-bg{
+    display: flex;
+    width: 100%;
+    flex-direction:row ;
+    justify-content :space-around; 
+    .con_top_lrft{
+        width: 40%;
+        height: 300px;
+        // background: #f1f1f1;
+        // box-shadow: 0 2px 4px rgba(0, 0, 0, .12), 0 0 6px rgba(0, 0, 0, .04);
+        box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+        .con_top_lrft_top{
+            margin-left: 20px;
+            margin-top: 10px;
+            color: #303133;
+        }
+        .con_top_buttom{
+            display: flex;
+            flex-direction:row ;
+            justify-content :space-between ;
+            padding-top:10px;
+            .con_top_left_left{
+            width: 295px;
+            height: 300px;
+            p{
+                text-align: center;
+                margin-top: -70px;
+            }
+            }
+            .con_top_left_right{
+                width: 295px;
+                height: 300px;
+                p{
+                    text-align: center;
+                    margin-top: -70px;
+                }
+            }
+        }
+    }
+    .con_top_middle{
+        width: 40%;
+        height: 300px;
+        // background: #f1f1f1;
+        box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+        .con_top_middle_top{
+            margin-left: 20px;
+            margin-top: 10px;
+            color: #303133;
+        }
+    }
+    .con_top_right{
+        width: 18%;
+        height: 300px;
+        // background: #f1f1f1;
+        box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+        .con_top_right_top{
+            background: #059d9d;
+            color: white;
+            height: 30px;
+            line-height: 30px;
+        }
+        .con_top_right_bottom{
+            p{
+                margin-left: 15px;
+            }
+        }
+    }
+    .con_mid_lrft{
+        width: 40%;
+        height: 340px;
+        box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+        .con_mid_lrft_top{
+            margin-left: 20px;
+            margin-top: 10px;
+            color: #303133;
+        }
+        .con_mid_left_time{
+            text-align: center;
+            margin-top: -50px;
+        }
+    }
+    .con_mid_middle{
+        width: 40%;
+        height: 340px;
+        box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+        .con_mid_middle_top{
+            margin-left: 20px;
+            margin-top: 10px;
+            color: #303133;
+        }
+        .con_mid_middle_time{
+            text-align: center;
+            margin-top: -50px;
+        }
+    }
+    .con_mid_right{
+        width: 18%;
+        height: 340px;
+        box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+        .con_mid_right_top{
+            background: #059d9d;
+            color: white;
+            height: 30px;
+            line-height: 30px;
+        }
+        .con_mid_right_bottom{
+            p{
+                margin-left: 15px;
+            }
+        }
+    }
+}
+.bottom_bon_all{
+        background: #fff;
+        margin-top: 10px;
+        padding: 10px;
+         .bottom_title{
+            // width: 100%;
+            background: #059d9d;
+            color: white;
+            height: 30px;
+            line-height: 30px;
+        }
+        li{
+            list-style: none;
+        }
+    }
 </style>
