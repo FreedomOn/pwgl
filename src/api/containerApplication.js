@@ -1,6 +1,24 @@
 import request from '@/utils/request'
 import qs from 'qs'
 
+//部署管理应用部署新增应用
+export const addNewApply= (addNewApplyData) => {
+    return new Promise((resolve,reject) =>{
+        request({
+            method:'post',
+            url:' /wlsbgl/container/addContainer',
+            data: qs.stringify(addNewApplyData)  //将传递的参数变为字符形式
+          })
+           .then((res) => {
+               resolve(res.data)
+           })
+           .catch((err) => {
+               console.log(err);
+               reject(err)
+           })
+    })
+}
+
 //部署管理页面查询数据
 export const selectDeploy= (deploySelectData) => {
     return new Promise((resolve,reject) =>{

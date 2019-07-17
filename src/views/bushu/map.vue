@@ -14,9 +14,40 @@
       <el-amap class="amap-box" :plugin="plugin" vid="amap-vue" :zoom="zoom" :center="center">
           <el-amap-marker v-for="marker in markers" :key="  
           marker.id"  :position="marker.position" :text="marker.text" :events="marker.markderclick"></el-amap-marker>
-          <el-amap-text v-for="(text,index) in markers" :key="index" :text="text.text" :offset="text.offset" :position="text.position" ></el-amap-text>
+          <el-amap-text v-for="(text,index) in markers" :key="index" :text="text.text" :offset="text.offset" :position="text.position" >
+          </el-amap-text>
+          <!-- <el-amap-info-window
+            :position="currentWindow.position"
+            :content="currentWindow.content"
+            :visible="currentWindow.visible"
+            :events="currentWindow.events"
+            autoMove=true>
+          </el-amap-info-window> -->
       </el-amap>
     </div>
+    <el-dialog
+      title="设备基本信息"
+      :visible.sync="dialogVisible"
+      width="25%"
+      :before-close="handleClose">
+
+      <el-form :label-position="labelPosition" label-width="100px" :model="device">
+        <el-form-item label="设备名称：">
+          {{device.name}}
+        </el-form-item>
+        <el-form-item label="版本：">
+          {{device.firmwareVersion}}
+        </el-form-item>
+        <el-form-item label="设备类型：">
+          {{device.type}}
+        </el-form-item>
+        <el-form-item label="设备状态：">
+          {{device.statusId}}
+        </el-form-item>
+      </el-form>
+
+
+    </el-dialog>
   </div>
 </template>
 
@@ -32,6 +63,35 @@
        resdata: [],
        markers: [],
        texts:[],
+       dialogVisible: false,
+       device:{
+         name:'',
+         firmwareVersion:'',
+         type:'',
+         statusId:'',
+       },
+       labelPosition: 'right',
+      //  currentWindow: {
+      //       position: [0, 0],
+      //       content: '',
+      //       events: {},
+      //       visible: false
+      //  },
+      //  slotWindow: {
+      //       position: [120.163936,30.254841]
+      //   },
+      //  windows: [
+      //       {
+      //         position: [120.18726,30.288452],
+      //         content: 'Hi! I am here!',
+      //         visible: true,
+      //         events: {
+      //           close() {
+      //             console.log('close infowindow1');
+      //           }
+      //         }
+      //       }
+      //   ],
        plugin: [{
             pName: 'Geolocation',
             events: {
@@ -64,6 +124,9 @@
             console.log(err)
           })
       },
+      handleClose(done) {
+            done();
+     },
       // 获取地图图标数据
       getmark (data) {
          let markder = [];
@@ -78,6 +141,37 @@
               'markderclick':{
                 click: (id) => {
                  console.log(ele.id);
+                 that.dialogVisible = true;
+                 let oneDevice = {
+                   'id':ele.id,
+                 }
+                 that.$axios({
+                    method:'post',
+                    url:'/wlsbgl/device/getDeviceMapOne',
+                    data: that.qs.stringify(oneDevice)
+                 })
+                 .then((res)=>{
+                   console.log(res.data);
+                   that.device.name = res.data.name;
+                   that.device.firmwareVersion = res.data.firmwareVersion;
+                   let deviceType = res.data.type;
+                   if (deviceType == 0) {
+                      that.device.type = "网关设备"
+                    }else if(deviceType==1){
+                      that.device.type = "终端设备"
+                    }
+                   let deviceStatus = res.data.statusId;
+                    if(deviceStatus == 0){
+                      that.device.statusId = '在线'
+                    }else if(deviceStatus == 1){
+                     that.device.statusId = '离线'
+                    }else if(deviceStatus == 2){
+                      that.device.statusId = '故障'
+                    }
+                 })
+                 .catch((err)=>{
+                   console.log(err)
+                 })
                 },
               }
             })

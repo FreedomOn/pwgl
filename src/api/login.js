@@ -15,3 +15,19 @@ export function login(logindata) {
   })
 }
 
+// 验证登陆 
+
+export function toLogin(logindata) {
+  return new Promise ((resolve,reject) => {
+    request({
+      method: 'get',
+      url:'wlsbgl/user/toLogin' 
+      // data: qs.stringify(logindata)
+    }).then((val) => {
+      resolve(val.data)
+    }).catch((err) => {
+       reject(err)
+    })
+  })
+}
+

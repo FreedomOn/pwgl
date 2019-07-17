@@ -35,7 +35,7 @@
             </div>
             <div class="con_top_right_bottom">
                 <p>-镜像数量({{mirrNum}})</p>
-                <p>-应用数量({{applyNum}}})</p>
+                <p>-应用数量({{applyNum}})</p>
                 <p>-容器设备数量({{deviceNum}})</p> 
             </div> 
         </div>
@@ -115,7 +115,10 @@ import { mapGetters } from 'vuex'
 export default {
   name: 'dashboard',    
   mounted() {
-    
+    this.getAllNum();
+    this.getConType();
+    this.getDeviceType();
+    this.getDeviceGroup();
   },
   methods: {
       //设备数量趋势选择时间段
@@ -125,8 +128,77 @@ export default {
     },
     deviceTypeSelTime(value){
         console.log(this.deviceTypeValue)
-    }
+    },
+    //获取应用统计 1.镜像数量 2.应用数量 3. 容器设备数量
+    getAllNum(){
+        this.$axios({
+            method:'post',
+            url:'/wlsbgl/index/appImageDeviceNum',
+        })
+        .then((res) => {
+            console.log(res.data);
+            this.mirrNum = res.data.imageNum;
+            this.applyNum = res.data.appNum;
+            this.deviceNum = res.data.DeviceHostNum;
+        })
+        .catch((err) => {
+            console.log(err)
+        });
+    },
+    //获取容器状态统计
+    getConType(){
+        this.$axios({
+            method:'post',
+            url:'/wlsbgl/index/statusDevice',
+        })
+        .then((res) => {
+            console.log(res.data);
+            this.histchartData.rows = res.data.rows
+        })
+        .catch((err) => {
+            console.log(err)
+        });
+    },
+    //当前设备统计里面的 设备类型 接口
+    getDeviceType(){
+        this.$axios({
+            method:'post',
+            url:' /wlsbgl/index/typeDevice',
+        })
+        .then((res) => {
+            console.log(res.data);
+            this.piechartData.rows = res.data.rows;
+            console.log(this.piechartData.rows)
+        })
+        .catch((err) => {
+            console.log(err)
+        });
+    },
+    //当前设备统计里面的 设备分组 接口
+    getDeviceGroup(){
+        this.$axios({
+            method:'post',
+            url:'/wlsbgl/index/DeviceGroup'
+        })
+        .then((res) => {
+            console.log(res.data);
+            this.piechartDataGroup.rows = res.data.rows;
+            let groupData = res.data.rows;
+            let arr = [];
+            for(let i=0;i<groupData.length;i++){
+                arr.push(groupData[i].设备分组)
+            }
+            console.log(arr);
+            this.piechartDataGroup.columns = arr;
+        })
+        .catch((err) => {
+            console.log(err)
+        });
+    },
+    
+    
   },
+  
   data () {  
     //设备类型扇形图
     this.piechartSettings = {
@@ -135,7 +207,7 @@ export default {
       radius: 60,
       offsetY:140
     }
-    //设备分组山西图
+    //设备分组扇形图
     this.piechartSettingsGroup = {
       dimension: '设备分组',
       metrics: '设备个数',
@@ -173,28 +245,23 @@ export default {
     return {
       //设备类型数据
       piechartData: {
-            columns: ['网管设备', '终端设备'],
-            rows: [
-                { '设备类型': '网管设备', '设备个数': 1393 },
-                { '设备类型': '终端设备', '设备个数': 3530 },
-            ]
+            columns: ['网关设备', '终端设备'],
+            rows: []
         },
       //设备分组数据
        piechartDataGroup: {
-            columns: ['东区', '南区','西区','北区'],
+            columns: [],
             rows: [
-            { '设备分组': '东区', '设备个数': 1393 },
-            { '设备分组': '南区', '设备个数': 3530 },
-            { '设备分组': '西区', '设备个数': 2530 },
-            { '设备分组': '北区', '设备个数': 4530 },
+                // { '设备分组': '东区', '设备个数': 1393 },
+                // { '设备分组': '南区', '设备个数': 3530 },
+                // { '设备分组': '西区', '设备个数': 2530 },
+                // { '设备分组': '北区', '设备个数': 4530 },
             ]
         },
         //容器状态统计数据
         histchartData: {
             columns: [ '在线', '离线', '故障'],
-            rows: [
-            { '容器状态':'', '在线': 13, '离线': 15, '故障': 32 },
-            ]
+            rows: []
         },
         //设备数量趋势数据
         deviceLineChartData: {

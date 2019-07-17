@@ -529,7 +529,8 @@ export default {
   mounted() {
     this.getData();  
     this.getTreeGroup();
-    this.getnum();
+    // this.getnum();
+    this.getDeviceNum();
   },
   methods: {
     //设备按钮组操作
@@ -539,6 +540,7 @@ export default {
         if(command == 'aa'){
           console.log('设备添加')
           that.facilityAdd();
+          that.getDeviceNum();
         }else if(command == 'bb'){
           that.excelDaocru();
           console.log('设备导入')
@@ -603,81 +605,105 @@ export default {
           this.loading = false;
         } 
       },
-      async getnum(){
+      //获取左侧树得个数
+      async getDeviceNum(){
           let that = this;
-          let currentNum = that.currentPage;
-          let everyNum = that.devicePageSize;
-          let gatewayTotal = 0;
-          let data2 = that.data2;
-          let devicewg = {
-            'pageSize':currentNum,
-            'pageNum':everyNum,
-            'type':0,
-            'deviceGroupId':-1,
-            'statusId':-1
-          }
-          let gatewayData = await selectDevice(devicewg);
-          console.log(11111111)
-          console.log(gatewayData)
-          let offFhildren = [];
-          let onChildren = [];
-          gatewayData.rows.forEach(element =>{
-            if(element.statusId == 1){
-                console.log(element)
-                offFhildren.push(element.id)
-                // data2[0].children[0].children[0].num = offarr.length;
-                // gatewayTotal = gatewayTotal+gatewayData.rows.length;
-            }
-            else if(element.statusId == 0){
-                onChildren.push(element.id)
-                // data2[0].children[0].children[1].num = gatewayData.rows.length;
-                // gatewayTotal = gatewayTotal+gatewayData.rows.length;
-            }
-        })
-        console.log(offFhildren.length);
-        data2[0].children[0].children[1].num = offFhildren.length;
-        data2[0].children[0].children[0].num = onChildren.length;
-        data2[0].children[0].num = gatewayData.rows.length;
-        console.log(gatewayTotal)
-        let endpointTotal = 0;
-        let devicezd = {
-            'pageSize':currentNum,
-            'pageNum':everyNum,
-            'type':1,
-            'deviceGroupId':-1,
-            'statusId':-1
-          }
-        let endpointData = await selectDevice(devicezd);
-        console.log(22222)
-        console.log(endpointData)
-        let online = [];
-        let offline = [];
-        let guline = [];
-        endpointData.rows.forEach(element =>{
-        if(element.statusId == 0){//在线
-            online.push(element.id)
-            // data2[0].children[1].children[0].num = endpointData.rows.length;
-            // endpointTotal = endpointTotal+endpointData.rows.length;
-        }
-        else if(element.statusId == 1){//离线
-            offline.push(element.id)
-            // data2[0].children[1].children[1].num = endpointData.rows.length;
-            // endpointTotal = endpointTotal+endpointData.rows.length;
-        }
-        else if(element.statusId == 2){//故障
-            guline.push(element.id)
-            // data2[0].children[1].children[2].num = endpointData.rows.length;
-            // endpointTotal = endpointTotal+endpointData.rows.length;
-        }
-        })
-        console.log(offFhildren.length);
-        data2[0].children[1].children[0].num = online.length; 
-        data2[0].children[1].children[1].num = offline.length; 
-        data2[0].children[1].children[2].num = guline.length; 
-        data2[0].children[1].num = endpointData.rows.length;
-        data2[0].num =gatewayData.rows.length + endpointData.rows.length;
-        console.log(offline)
+          that.$axios({
+          method:'post',
+          url:'/wlsbgl/device/getDeviceNum',
+          })
+          .then((res)=>{
+              console.log(res.data)
+                let data2 = that.data2;
+                data2[0].num = res.data.num; //zong
+                data2[0].children[0].num = res.data.wgNum;
+                data2[0].children[0].children[1].num = res.data.wglxNum;
+                data2[0].children[0].children[0].num = res.data.wgzxNum;
+                data2[0].children[1].num = res.data.zdNum;
+                data2[0].children[1].children[0].num = res.data.zdzxNum; 
+                data2[0].children[1].children[1].num = res.data.zdlxNum; 
+                data2[0].children[1].children[2].num = res.data.zdgzNum; 
+                
+          })
+          .catch((err)=>{
+              console.log(err);
+      })
       },
+      // async getnum(){
+      //     let that = this;
+      //     let currentNum = that.currentPage;
+      //     let everyNum = that.devicePageSize;
+      //     let gatewayTotal = 0;
+      //     let data2 = that.data2;
+      //     let devicewg = {
+      //       'pageSize':currentNum,
+      //       'pageNum':everyNum,
+      //       'type':0,
+      //       'deviceGroupId':-1,
+      //       'statusId':-1
+      //     }
+      //     let gatewayData = await selectDevice(devicewg);
+      //     console.log(11111111)
+      //     console.log(gatewayData)
+      //     let offFhildren = [];
+      //     let onChildren = [];
+      //     gatewayData.rows.forEach(element =>{
+      //       if(element.statusId == 1){
+      //           console.log(element)
+      //           offFhildren.push(element.id)
+      //           // data2[0].children[0].children[0].num = offarr.length;
+      //           // gatewayTotal = gatewayTotal+gatewayData.rows.length;
+      //       }
+      //       else if(element.statusId == 0){
+      //           onChildren.push(element.id)
+      //           // data2[0].children[0].children[1].num = gatewayData.rows.length;
+      //           // gatewayTotal = gatewayTotal+gatewayData.rows.length;
+      //       }
+      //   })
+      //   console.log(offFhildren.length);
+      //   data2[0].children[0].children[1].num = offFhildren.length;
+      //   data2[0].children[0].children[0].num = onChildren.length;
+      //   data2[0].children[0].num = gatewayData.rows.length;
+      //   console.log(gatewayTotal)
+      //   let endpointTotal = 0;
+      //   let devicezd = {
+      //       'pageSize':currentNum,
+      //       'pageNum':everyNum,
+      //       'type':1,
+      //       'deviceGroupId':-1,
+      //       'statusId':-1
+      //     }
+      //   let endpointData = await selectDevice(devicezd);
+      //   console.log(22222)
+      //   console.log(endpointData)
+      //   let online = [];
+      //   let offline = [];
+      //   let guline = [];
+      //   endpointData.rows.forEach(element =>{
+      //   if(element.statusId == 0){//在线
+      //       online.push(element.id)
+      //       // data2[0].children[1].children[0].num = endpointData.rows.length;
+      //       // endpointTotal = endpointTotal+endpointData.rows.length;
+      //   }
+      //   else if(element.statusId == 1){//离线
+      //       offline.push(element.id)
+      //       // data2[0].children[1].children[1].num = endpointData.rows.length;
+      //       // endpointTotal = endpointTotal+endpointData.rows.length;
+      //   }
+      //   else if(element.statusId == 2){//故障
+      //       guline.push(element.id)
+      //       // data2[0].children[1].children[2].num = endpointData.rows.length;
+      //       // endpointTotal = endpointTotal+endpointData.rows.length;
+      //   }
+      //   })
+      //   console.log(offFhildren.length);
+      //   data2[0].children[1].children[0].num = online.length; 
+      //   data2[0].children[1].children[1].num = offline.length; 
+      //   data2[0].children[1].children[2].num = guline.length; 
+      //   data2[0].children[1].num = endpointData.rows.length;
+      //   data2[0].num =gatewayData.rows.length + endpointData.rows.length;
+      //   console.log(offline)
+      // },
       //分页
       handleSizeChange(val) {
         console.log(`每页 ${val} 条`);
@@ -914,10 +940,10 @@ export default {
           url:'/wlsbgl/hostGroup/gethostGroupName',
           })
           .then((res)=>{
-              console.log(res)
+              console.log(res.data.rows);
               that.conOptions = res.data.rows;
               that.updateOptions = res.data.rows;
-          })
+            })
           .catch((err)=>{
               console.log(err);
       })
@@ -1004,6 +1030,7 @@ export default {
         if(addsj.status == '200'){
           that.adddialogVisible = false;
           that.loading = false;
+          that.getDeviceNum();
           that.$notify({
             title: '成功',
             message: '新增成功',
@@ -1090,7 +1117,7 @@ export default {
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-           that.sureDeleteDevice(data)
+           that.sureDeleteDevice(data);
         }).catch(() => {
            console.log('取消了删除')
        })
@@ -1109,19 +1136,20 @@ export default {
         that.deleteDevicedialogVisible = false;
         if(delsj.status == '200'){
           that.loading = false;
+          that.getDeviceNum();
           that.$notify({
             title: '成功',
             message: delsj.msg,
             type: 'success'
           });
-          that.getData();
+          that.getTreeData();
         }else{
           that.loading = false;
           that.$notify.error({
                 title: '失败',
                 message: delsj.msg,
             });
-          that.getData();
+          that.getTreeData();
           }
       },
     renderContent(h, { node, data, store }) {
@@ -1176,8 +1204,9 @@ export default {
       that.updateNetwork.weidu = scope.lng;//维度
       that.updateNetwork.textarea = scope.description;//描述
       that.updateNetwork.hardware = scope.hardwareInfo;//硬件信息
-      that.updateNetwork.container = scope.id;//容器版本
+      that.updateNetwork.container = scope.hostGroupId;//容器版本
       that.updateNetwork.uuid = scope.uuid;
+      let selectcity = scope.hostGroupId;
       console.log(that.updateNetwork.groupid,that.updateNetwork.value)
       //还差一个容器版本
       that.getdatetime();
@@ -1293,7 +1322,8 @@ export default {
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-           that.sureDeleteGroup(data)
+           that.sureDeleteGroup(data);
+           that.getDeviceNum();
         }).catch(() => {
            console.log('取消了删除')
        })

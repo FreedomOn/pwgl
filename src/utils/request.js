@@ -32,33 +32,17 @@ service.interceptors.response.use(
   */
     NProgress.done()
     console.log(response.status)
-    if(response.status == 500) {
+    if(response.status == 500 || response.status == 504) {
       Message({
         message: '服务器维修中，请联系开发人员',
         type: 'error',
         duration: 5 * 1000
       })
       return Promise.reject('error')
-    }
-
-    if(response.status == 200) {
-      // console.log('正常请求')
-      // const res = response.data
-      // if(res.result == 'false') {
-      //   Message({
-      //     message: res.message,
-      //     type: 'error',
-      //     duration: 5 * 1000
-      //   })
-      //   return Promise.reject('error')
-      // }else {
+    }else if(response.status == 200) {
         return response
       // }
-    }
-    
-
-      // 50008:非法的token; 50012:其他客户端登录了;  50014:Token 过期了;
-      if (response.status === 302) {
+    }else if (response.status === 302) {
         console.log('我进来了吗')
         MessageBox.confirm('长时间未进行操作，你可以取消继续留在该页面，或者重新登录', '确定登出', {
           confirmButtonText: '重新登录',
@@ -80,11 +64,6 @@ service.interceptors.response.use(
   error => {
     NProgress.done()
     console.log('err' + error)// for debug
-    Message({
-      message: error.message,
-      type: 'error',
-      duration: 5 * 1000
-    })
     return Promise.reject(error)
   }
 )

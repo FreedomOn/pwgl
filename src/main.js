@@ -44,35 +44,38 @@ Vue.prototype._ = lodash
 
 
 router.beforeEach((to, from, next) => {
-  const role = sessionStorage.getItem('role')
-  if (role) {
-    // console.log('登录过了')
-    if (to.path === '/login') {
-      next({ path: '/' })
-    } else { 
-      if(store.getters.userlist.length === 0){
-
-        store.dispatch('GetuserInfo')
-        const roles = [ store.getters.usertype ]
-
-        store.dispatch('GenerateRoutes', { roles }).then(() => { // 根据roles权限生成可访问的路由表
-          router.addRoutes(store.getters.addRouters) // 动态添加可访问路由表
-          next({ ...to, replace: true }) // hack方法 确保addRoutes已完成 ,set the replace: true so the navigation will not leave a history record
-        })
-      }else {
-        next()
+  store.dispatch('ToLogin').then((loginrole) => {
+    const role = sessionStorage.getItem('role')
+    if (role && loginrole) {
+      // console.log('登录过了')
+      if (to.path === '/login') {
+        next({ path: '/' })
+      } else { 
+        if(store.getters.userlist.length === 0){
+  
+          store.dispatch('GetuserInfo')
+          const roles = [ store.getters.usertype ]
+  
+          store.dispatch('GenerateRoutes', { roles }).then(() => { // 根据roles权限生成可访问的路由表
+            router.addRoutes(store.getters.addRouters) // 动态添加可访问路由表
+            next({ ...to, replace: true }) // hack方法 确保addRoutes已完成 ,set the replace: true so the navigation will not leave a history record
+          })
+        }else {
+          next()
+        }
+  
       }
-
+    } else {
+        // console.log('没有登录')
+        if(to.path === '/login') {
+          next()
+        }else {
+          next('/login')
+        }
+       
     }
-  } else {
-      // console.log('没有登录')
-      if(to.path === '/login') {
-        next()
-      }else {
-        next('/login')
-      }
-     
-  }
+  })
+  
 })
 
 new Vue({

@@ -1,8 +1,12 @@
 import Cookies from 'js-cookie'
 import { asyncRouterMap ,constantRouterMap } from '@/router'
+import axios from '@/utils/request'
+import qs from 'qs'
 
 // let tools = require('vue-auth-control')
 import { filterAsyncRouter } from 'vue-auth-control'
+import { toLogin } from '@/api/login'
+
 
 // /**
 //  * 通过meta.role判断是否与当前用户权限匹配
@@ -97,7 +101,30 @@ const app = {
         commit('SET_ROUTERS', accessedRouters)
         resolve()
       })
-    }
+    },
+    // 验证登陆
+    ToLogin({ commit }, data) {
+      // console.log('leaflefa')
+      // console.log(data)
+      return new Promise((resolve, reject) => {
+        let postdata = {
+          'token': 'yeliangliang'
+        }
+        axios('wlsbgl/user/toLogin2', {
+          method: 'POST',
+          data: qs.stringify(postdata)
+        }).then((resdata) => {
+            console.log(resdata)
+            if(resdata.data.status === 302) {
+              resolve(false)
+            }else {
+              resolve(true)
+            }
+            
+          })
+       
+      })
+    },
   }
 }
 

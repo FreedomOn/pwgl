@@ -19,19 +19,19 @@
     <div class="avatar-username"  @click="personInfo()" style="cursor:pointer">
        {{name}}
     </div>
-    <el-dropdown class="avatar-container"  trigger="click">
+    <el-dropdown class="avatar-container"  trigger="click"  @command="handleCommand">
       <div class="avatar-wrapper">
         <img class="user-avatar" :src="avatar" :onerror="imgerr">
         <i class="el-icon-caret-bottom"></i>
       </div>
       <el-dropdown-menu class="user-dropdown" slot="dropdown">
         <!-- <router-link class="inlineBlock" to="/info"> -->
-          <!-- <el-dropdown-item>
-            <span @click="goHome">首页</span> 
-          </el-dropdown-item> -->
+          <el-dropdown-item command="a">
+            <span>首页</span> 
+          </el-dropdown-item>
         <!-- </router-link> -->
-        <el-dropdown-item >
-          <span @click="logout" style="display:block;">退出</span>
+        <el-dropdown-item command="b" divided>
+          <span style="display:block;" >退出</span>
         </el-dropdown-item>
       </el-dropdown-menu>
     </el-dropdown>
@@ -198,6 +198,18 @@ export default {
     },
     handleClose(done) {
        done();
+    },
+    handleCommand(command) {
+      if(command =='a'){
+         console.log('sss')
+        this.getactive(); 
+        this.$router.push('/info')
+        localStorage.setItem("haha", "/info");
+        this.activeIndex = localStorage.getItem('haha');
+        location.reload()
+      }else if(command =='b'){
+        this.logout();
+      }
     },
      handleSelect(key, keyPath) {
         localStorage.removeItem("activetab")

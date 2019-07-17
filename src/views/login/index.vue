@@ -95,6 +95,8 @@ export default {
       console.log(4444)
       localStorage.setItem('user', JSON.stringify(userdata.data));
       that.$router.push({ path: '/info' })
+      localStorage.setItem("haha", "/info");
+        // this.activeIndex = localStorage.getItem('haha');
     },
     handleLogin() {
       const that = this

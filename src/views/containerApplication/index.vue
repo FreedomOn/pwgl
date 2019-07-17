@@ -231,6 +231,98 @@
                 </el-tabs>
              </div>
         </div> 
+        <!-- 部署应用 -->
+        <el-dialog title="应用部署" :visible.sync="deployDlgVisible" width="80%" :before-close="handleClose">
+            <el-form :inline="true" :model="deployForm" ref="deployForm" :rules="rules" label-width="120px">
+                <div class="addStyle">
+                <el-row>
+                    <el-col :span="12">
+                    <el-row>
+                        <el-col :span="20">
+                            <el-form-item label="设备名称" prop='deviceName'>
+                            <el-input v-model="deployForm.deviceName" style="width:300px"></el-input>
+                            </el-form-item> 
+                        </el-col>
+                    </el-row>
+                    <el-row>
+                        <el-col :span="20">
+                            <el-form-item label="容器版本" prop='appVersion'>
+                            <el-input v-model="deployForm.appVersion" style="width:300px"></el-input>
+                            </el-form-item> 
+                        </el-col>
+                    </el-row>
+                    <el-row>
+                        <el-col :span="20">
+                            <el-form-item label="启动时间" prop='lastUpTime'>
+                            <el-input v-model="deployForm.lastUpTime" style="width:300px"></el-input>
+                            </el-form-item> 
+                        </el-col>
+                    </el-row>
+                    <el-row>
+                        <el-col :span="20">
+                            <el-form-item label="关闭时间" prop='id'>
+                            <el-input v-model="deployForm.lastStopTime" style="width:300px"></el-input>
+                            </el-form-item> 
+                        </el-col>
+                    </el-row>
+                    <el-row>
+                        <el-col :span="20">
+                            <el-form-item label="状态" prop='id'>
+                            <el-input v-model="deployForm.id" style="width:300px"></el-input>
+                            </el-form-item> 
+                        </el-col>
+                    </el-row>
+                    <el-row>
+                        <el-col :span="20">
+                            <el-form-item label="应用" prop='id'>
+                                <el-select v-model="selectApp" placeholder="请选择">
+                                <el-option
+                                    v-for="(item,index) in appList"
+                                    :key="index"
+                                    :label="item.name"
+                                    :value="item.id">
+                                </el-option>
+                                </el-select>
+                            <el-button type="success" round icon="el-icon-circle-plus-outline" @click="addApp()">添加应用</el-button>
+                            </el-form-item> 
+                        </el-col>
+                    </el-row>
+                    
+                    </el-col>
+                    <el-col :span="12">
+                    <el-row justify="space-around">
+                        <el-col :span="8" v-for="(item,index) in appSelectList" :key="index">
+                        <el-card :body-style="{ padding: '0px',height:'235px' }">
+                            <div class="appimage" >
+                                <img src="/static/images/app.png" class="appimage_image">
+                            </div>
+                            <div style="padding: 8px;">
+                            <span>{{item.name}}</span>
+                            <span>[{{item.version}}]</span>
+                            <div class="bottom clearfix">
+                                <time class="time clearfix">{{item.createTime}}</time>
+                                <el-tooltip class="item" effect="dark" content="是否启动？" placement="left">
+                                    <el-button @click="deployItem(scope.row)" circle icon="el-icon-caret-right"></el-button> 
+                                </el-tooltip>
+                                <el-tooltip class="item" effect="dark" content="Bottom Center 提示文字" placement="bottom">
+                                    <el-button @click="deployItem(scope.row)" circle icon="el-icon-remove-outline"></el-button>
+                                </el-tooltip>
+                               <el-tooltip class="item" effect="dark" content="是否删除" placement="right">
+                                 <el-button @click="removeApp(item)" circle icon="el-icon-delete"></el-button>
+                                </el-tooltip>       
+                            </div>
+                            </div>
+                        </el-card>
+                        </el-col>
+                    </el-row>
+                    </el-col>
+                </el-row>
+            </div>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="deployDlgVisible = false">关闭</el-button>
+            </span>
+            </el-dialog>
         <!-- 应用 -->
         <el-dialog
             title="应用添加"
@@ -341,7 +433,7 @@
     </div>
 </template>
 <script>
-import { selectDeploy,selectMirring,applyAdd,applySelectapply,delDevice,delApplyDevice} from '@/api/containerApplication'
+import { selectDeploy,selectMirring,applyAdd,applySelectapply,delDevice,delApplyDevice,addNewApply} from '@/api/containerApplication'
 export default {
   data() {
       return {
@@ -360,6 +452,18 @@ export default {
         applyPageSize:10,
         bushucurrentPage:1,
         bushuPageSize:10,
+        deployDlgVisible:false,
+        deployForm:{
+            id:"",
+            deviceName:"",
+            hostVersion:"",
+            lastUpTime:"",
+            lastStopTime:"",
+            app:"",
+        },
+        selectApp:"",
+        appSelectList:[],
+        appList:[],
         mirtotal:1,
         applytotal:1,
         bushutotal:1,
@@ -541,6 +645,54 @@ export default {
         //部署管理 应用部署
         applicationDeployment(scope){
             console.log(scope);
+            let that = this;
+            that.deployDlgVisible = true;
+        },
+        async addApp(){
+            let that = this;
+            that.selectApp == ""
+            if(that.selectApp == ""){
+                this.$message.error('请先选择一个应用')
+                return false
+            }
+            let findFlag = false
+            that.appSelectList.forEach((v)=>{
+                if(v.id == that.selectApp) {
+                    findFlag = true
+                    this.$message.warning('该应用已添加')
+                }
+            })
+            if(!findFlag){
+                let addNewApplyData = ""
+                let addAppData = ""
+                that.appList.forEach((v)=>{
+                    if(v.id == that.selectApp) {
+                    addAppData = v;
+                    that.appSelectList.push(v)
+                    addNewApplyData = {
+                        'hostId':that.deployForm.id,
+                        'appId':that.selectApp,
+                    }
+                    }
+                })
+                if(addNewApplyData != ""){
+                let addRs = await addNewApply(addNewApplyData);
+                console.log(addRs)
+                if(addRs.status == 200){
+                    addAppData["containerId"] = addRs.data.data
+                    that.$notify.success({
+                    title: '成功',
+                    message: '新增成功',
+                    });
+                }
+                else{
+                    that.$notify.error({
+                        title: '失败',
+                        message: '新增失败',
+                    });
+                }
+                }
+            }
         },
         //获取所有容器和id
         getAllContail(){
@@ -581,6 +733,8 @@ export default {
                 //     newArr.push(element)
                 // })
                 that.applyTableData = applydata.rows;
+                that.appList = applydata.rows;
+                console.log(that.appList)
                 that.applytotal = applydata.total;
             }
         },
@@ -961,5 +1115,14 @@ export default {
          float: right;
      }
 }
-
+.appimage{
+    width: 80%;
+    margin: auto;
+    height: 131px;
+    // padding-left: 25px;
+    .appimage_image{
+        width: 100%;
+         height: 131px;
+    }
+}
 </style>
