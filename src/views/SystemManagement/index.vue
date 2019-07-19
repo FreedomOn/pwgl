@@ -59,7 +59,7 @@
                                 >
                                 <template slot-scope="scope">
                                     <el-button-group>
-                                    <el-button @click="userDetail(scope.row)" type="primary"  icon="el-icon-info"  size="small">查看</el-button>
+                                    <el-button @click="userDetail(scope.row)" type="info"  icon="el-icon-info"  size="small">查看</el-button>
                                     <el-button @click="usedelete(scope.row)" type="danger"  icon="el-icon-delete"  size="small">删除</el-button>
                                     </el-button-group>
                                 </template>
@@ -133,7 +133,7 @@
                                 >
                                 <template slot-scope="scope">
                                     <el-button-group>
-                                    <el-button @click="roleDetail(scope.row)" type="primary" icon="el-icon-info"  size="small">查看</el-button>
+                                    <el-button @click="roleDetail(scope.row)" type="info" icon="el-icon-info"  size="small">查看</el-button>
                                     <el-button @click="roleDel(scope.row)" type="danger"  icon="el-icon-delete"  size="small">删除</el-button>
                                     </el-button-group>
                                 </template>
@@ -155,15 +155,11 @@
                         <el-tab-pane label="事件列表" name="three">
                             <div class="header">
                                 <span>
-                                     <el-date-picker
-                                        v-model="eventDate"
-                                        type="date"
-                                        placeholder="选择日期">
-                                    </el-date-picker>
                                     <el-date-picker
-                                        v-model="twoeventDate"
-                                        type="date"
-                                        placeholder="选择日期">
+                                        v-model="eventListDate"
+                                        type="daterange"
+                                        start-placeholder="开始日期"
+                                        end-placeholder="结束日期">
                                     </el-date-picker>
                                 </span> 
                                   <span class="span1">
@@ -526,6 +522,41 @@
             <el-button type="primary" @click="sureDeletejs()">确 定</el-button>
         </span>
         </el-dialog>
+        <el-dialog title="角色权限详情：" :visible.sync="roleDetailDialog" width="40%">
+            <el-form :model="roleDetailForm">
+                <el-row>
+                    <el-col :span=12>
+                            <el-form-item label="角色名:" >
+                            {{roleDetailForm.name}}
+                        </el-form-item>
+                    </el-col>
+                        <el-col :span=12>
+                            <el-form-item label="下属用户:" >
+                            {{roleDetailForm.nextUser}}
+                        </el-form-item>
+                    </el-col>
+                </el-row>
+                <el-row>
+                    <el-col :span=12>
+                            <el-form-item label="状态:" >
+                            {{roleDetailForm.status}}
+                        </el-form-item>
+                    </el-col>
+                        <el-col :span=12>
+                            <el-form-item label="创建时间:" >
+                            {{roleDetailForm.createTime}}
+                        </el-form-item>
+                    </el-col>
+                </el-row>
+                <el-row>
+                    <el-col :span=12>
+                            <el-form-item label="更新时间:" >
+                            {{roleDetailForm.updateTime}} 
+                        </el-form-item>
+                    </el-col>
+                </el-row>             
+            </el-form>
+        </el-dialog>
     </div>
 </template>
 <script>
@@ -613,9 +644,16 @@ export default {
         rolevalue: [],
         roleinput:'',
         permissionId:[],
+        roleDetailDialog:false,
+        roleDetailForm:{
+            name:'',
+            nextUser:'', 
+            status:'', 
+            createTime:'',
+            updateTime:'',
+        },
         //事件列表
-        eventDate:'',
-        twoeventDate:'',
+        eventListDate:'',
         eventTableData:[],
         eventloading:true,
         eventselsctInput:'',
@@ -1075,6 +1113,17 @@ export default {
         roleDetail(scope){
             let that  = this;
             console.log(scope);
+            that.roleDetailDialog = true;
+            that.roleDetailForm.name = scope.name;
+            let aa = scope.roleUser
+            let arr = [];
+            for(let i=0;i<aa.length;i++){
+                arr.push(aa[i].iotUser.name)
+            }
+            that.roleDetailForm.nextUser = arr.join(';')
+            that.roleDetailForm.status = scope.isStatus;
+            that.roleDetailForm.createTime = scope.createTime;
+            that.roleDetailForm.updateTime = scope.updateTime;
         },
         //角色删除
         roleDel (data) {

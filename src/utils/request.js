@@ -31,7 +31,7 @@ service.interceptors.response.use(
   * code为非20000是抛错 可结合自己业务进行修改
   */
     NProgress.done()
-    console.log(response.status)
+    // console.log(response.status)
     if(response.status == 500 || response.status == 504) {
       Message({
         message: '服务器维修中，请联系开发人员',

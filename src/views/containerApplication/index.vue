@@ -45,24 +45,24 @@
                                 width="140">
                                 </el-table-column>
                                 <el-table-column
-                                prop="lastUpTime"
+                                prop="device.lastUpTime"
                                 label="启动时间">
                                 </el-table-column>
                                 <el-table-column
                                 fixed="right"
                                 label="操作"
-                                width="280"
+                                width="340"
                                 >
                                 <template slot-scope="scope">
                                     <el-button-group>
-                                    <el-button @click="deployDetail(scope.row)" type="info" icon="el-icon-info" size="small">查看</el-button>
-                                    <el-button @click="deployReload(scope.row)" type="danger"    icon="el-icon-refresh" size="small">重启</el-button>
+                                    <el-button @click="deployDetail(scope.row)" type="info" icon="el-icon-info" size="small" >查看</el-button>
+                                    <el-button @click="startDeploy(scope.row)" type="primary" icon="el-icon-caret-right" size="small"  v-if="scope.row.device.statusId === 1">启动</el-button>
+                                    <el-button @click="stopDeploy(scope.row)" type="primary" icon="el-icon-success" size="small"  v-if="scope.row.device.statusId === 0">停止</el-button>
+                                    <el-button @click="deployReload(scope.row)" type="danger"    icon="el-icon-refresh" size="small" :disabled="scope.row.device.statusId ===1">重启</el-button>
                                     <el-button @click="applicationDeployment(scope.row)" type="primary" icon="el-icon-setting" size="small">应用部署</el-button>
-                                    <!-- <el-button @click="mangedelete(scope.row)" type="text"  size="small">|删除</el-button>
-                                    <el-button @click="mangeupdate(scope.row)" type="text"  size="small">|编辑</el-button> -->
                                     </el-button-group>
-                                </template>
-                                </el-table-column>
+                                </template> 
+                                </el-table-column> 
                             </el-table>
                              <div>
                                 <el-pagination
@@ -136,7 +136,7 @@
                                 >
                                 <template slot-scope="scope">
                                     <el-button-group>
-                                    <el-button @click="applyDetail(scope.row)" type="primary" icon="el-icon-info" size="small">查看</el-button>
+                                    <el-button @click="applyDetail(scope.row)" type="info" icon="el-icon-info" size="small">查看</el-button>
                                     <el-button @click="applyDel(scope.row)" type="danger"  icon="el-icon-delete" size="small">删除</el-button>
                                     </el-button-group>
                                 </template>
@@ -209,7 +209,7 @@
                                 >
                                 <template slot-scope="scope">
                                     <el-button-group>
-                                    <el-button @click="mirroringDetail(scope.row)" type="primary"  icon="el-icon-info"  size="small">查看</el-button>
+                                    <el-button @click="mirroringDetail(scope.row)" type="info"  icon="el-icon-info"  size="small">查看</el-button>
                                     <el-button @click="mirroringDel(scope.row)" type="danger" icon="el-icon-delete"  size="small">删除</el-button>                             
                                     </el-button-group>
                                 </template>
@@ -232,49 +232,59 @@
              </div>
         </div> 
         <!-- 部署应用 -->
-        <el-dialog title="应用部署" :visible.sync="deployDlgVisible" width="80%" :before-close="handleClose">
+        <el-dialog title="应用部署" :visible.sync="deployDlgVisible" width="85%" :before-close="handleClose">
             <el-form :inline="true" :model="deployForm" ref="deployForm" :rules="rules" label-width="120px">
                 <div class="addStyle">
                 <el-row>
                     <el-col :span="12">
                     <el-row>
                         <el-col :span="20">
-                            <el-form-item label="设备名称" prop='deviceName'>
-                            <el-input v-model="deployForm.deviceName" style="width:300px"></el-input>
+                            <el-form-item label="设备名称:" prop='deviceName'>
+                                <span>
+                                    {{deployForm.deviceName}}
+                                </span>
                             </el-form-item> 
                         </el-col>
                     </el-row>
                     <el-row>
                         <el-col :span="20">
-                            <el-form-item label="容器版本" prop='appVersion'>
-                            <el-input v-model="deployForm.appVersion" style="width:300px"></el-input>
+                            <el-form-item label="容器版本：" prop='appVersion'>
+                                <span>
+                                    {{deployForm.appVersion}}
+                                </span>
                             </el-form-item> 
                         </el-col>
                     </el-row>
                     <el-row>
                         <el-col :span="20">
-                            <el-form-item label="启动时间" prop='lastUpTime'>
-                            <el-input v-model="deployForm.lastUpTime" style="width:300px"></el-input>
+                            <el-form-item label="启动时间：" prop='lastUpTime'>
+                                <span>
+                                    {{deployForm.lastUpTime}}
+                                </span>
                             </el-form-item> 
                         </el-col>
                     </el-row>
                     <el-row>
                         <el-col :span="20">
-                            <el-form-item label="关闭时间" prop='id'>
-                            <el-input v-model="deployForm.lastStopTime" style="width:300px"></el-input>
+                            <el-form-item label="关闭时间：" prop='id'>
+                             <span>
+                                 {{deployForm.lastStopTime}}
+                             </span>
                             </el-form-item> 
                         </el-col>
                     </el-row>
                     <el-row>
                         <el-col :span="20">
-                            <el-form-item label="状态" prop='id'>
-                            <el-input v-model="deployForm.id" style="width:300px"></el-input>
+                            <el-form-item label="状态：" prop='id'>
+                                <span>
+                                    {{deployForm.id}}
+                                </span>
                             </el-form-item> 
                         </el-col>
                     </el-row>
                     <el-row>
                         <el-col :span="20">
-                            <el-form-item label="应用" prop='id'>
+                            <el-form-item label="添加应用：" prop='id'>
                                 <el-select v-model="selectApp" placeholder="请选择">
                                 <el-option
                                     v-for="(item,index) in appList"
@@ -291,23 +301,26 @@
                     </el-col>
                     <el-col :span="12">
                     <el-row justify="space-around">
-                        <el-col :span="8" v-for="(item,index) in appSelectList" :key="index">
+                        <el-col :span="8" v-for="(item,index) in appSelectList" :key="index" :offset="1">
                         <el-card :body-style="{ padding: '0px',height:'235px' }">
                             <div class="appimage" >
                                 <img src="/static/images/app.png" class="appimage_image">
                             </div>
-                            <div style="padding: 8px;">
-                            <span>{{item.name}}</span>
-                            <span>[{{item.version}}]</span>
+                            <div style="padding: 8px;margin: 2px 2px;">
+                            <span>{{item.app.name}}</span>
+                            <span>[{{item.app.version}}]</span>
                             <div class="bottom clearfix">
                                 <time class="time clearfix">{{item.createTime}}</time>
-                                <el-tooltip class="item" effect="dark" content="是否启动？" placement="left">
-                                    <el-button @click="deployItem(scope.row)" circle icon="el-icon-caret-right"></el-button> 
+                                <el-tooltip class="item" effect="dark" content="是否启动？" placement="left" v-if="item.status === 1">
+                                    <el-button @click="deployItem(item)" circle  icon='el-icon-caret-right'></el-button> 
                                 </el-tooltip>
-                                <el-tooltip class="item" effect="dark" content="Bottom Center 提示文字" placement="bottom">
-                                    <el-button @click="deployItem(scope.row)" circle icon="el-icon-remove-outline"></el-button>
+                                <el-tooltip class="item" effect="dark" content="是否停止？" placement="left" v-if="item.status === 0">
+                                    <el-button @click="stopItem(item)" circle  icon='el-icon-circle-check'></el-button> 
                                 </el-tooltip>
-                               <el-tooltip class="item" effect="dark" content="是否删除" placement="right">
+                                <el-tooltip class="item" effect="dark" content="是否重启？" placement="bottom" >
+                                    <el-button @click="refresh(item)" circle icon="el-icon-refresh" :disabled="item.status === 1"></el-button>
+                                </el-tooltip>
+                               <el-tooltip class="item" effect="dark" content="是否删除？" placement="right">
                                  <el-button @click="removeApp(item)" circle icon="el-icon-delete"></el-button>
                                 </el-tooltip>       
                             </div>
@@ -323,6 +336,55 @@
                 <el-button @click="deployDlgVisible = false">关闭</el-button>
             </span>
             </el-dialog>
+        <!-- 布署管理详情 -->
+        <el-dialog title="布署管理详情：" :visible.sync="deplyDialogFormVisible" width="40%">
+            <el-form :model="deployDetailForm">
+                <el-row>
+                    <el-col :span=12>
+                            <el-form-item label="容器名称:" >
+                            {{deployDetailForm.name}}
+                        </el-form-item>
+                    </el-col>
+                        <el-col :span=12>
+                            <el-form-item label="所属设备:" >
+                            {{deployDetailForm.device}}
+                        </el-form-item>
+                    </el-col>
+                </el-row>
+                <el-row>
+                    <el-col :span=12>
+                            <el-form-item label="容器版本:" >
+                            {{deployDetailForm.version}}
+                        </el-form-item>
+                    </el-col>
+                        <el-col :span=12>
+                            <el-form-item label="设备状态:" >
+                            {{deployDetailForm.status}}
+                        </el-form-item>
+                    </el-col>
+                </el-row>
+                <el-row>
+                    <el-col :span=12>
+                            <el-form-item label="应用数量:" >
+                            {{deployDetailForm.num}}
+                        </el-form-item>
+                    </el-col>
+                        <el-col :span=12>
+                            <el-form-item label="启动时间:" >
+                            {{deployDetailForm.startTime}}
+                        </el-form-item> 
+                    </el-col>
+                </el-row>
+                    <el-row>
+                    <el-col :span=12>
+                        <el-form-item label="停止时间:" >
+                            {{deployDetailForm.stopTime}}
+                        </el-form-item>
+                    </el-col>
+                </el-row>                 
+            </el-form>
+        </el-dialog>
+
         <!-- 应用 -->
         <el-dialog
             title="应用添加"
@@ -362,6 +424,47 @@
                 <el-button @click="applyDialogVisible = false">取 消</el-button>
                 <el-button type="primary" @click="applySure('applyform')">确 定</el-button>
             </span>
+        </el-dialog>
+        <!-- 应用管理详情 -->
+        <el-dialog title="应用管理详情：" :visible.sync="applyDialogFormVisible" width="40%">
+                <el-form :model="applyDetailForm">
+                    <el-row>
+                        <el-col :span=12>
+                             <el-form-item label="应用名称:" >
+                                {{applyDetailForm.name}}
+                            </el-form-item>
+                        </el-col>
+                         <el-col :span=12>
+                             <el-form-item label="类型:" >
+                                {{applyDetailForm.type}}
+                            </el-form-item>
+                        </el-col>
+                    </el-row>
+                    <el-row>
+                        <el-col :span=12>
+                             <el-form-item label="镜像信息:" >
+                                {{applyDetailForm.info}}
+                            </el-form-item>
+                        </el-col>
+                         <el-col :span=12>
+                             <el-form-item label="状态:" >
+                                {{applyDetailForm.status}}
+                            </el-form-item>
+                        </el-col>
+                    </el-row>
+                    <el-row>
+                        <el-col :span=12>
+                             <el-form-item label="创建时间:" >
+                                {{applyDetailForm.createTime}}
+                            </el-form-item>
+                        </el-col>
+                         <el-col :span=12>
+                             <el-form-item label="更新时间:" >
+                                {{applyDetailForm.updateTime}} 
+                            </el-form-item> 
+                        </el-col>
+                    </el-row>             
+                </el-form>
         </el-dialog>
         <!-- 镜像 -->
         <el-dialog
@@ -408,27 +511,45 @@
                 <el-button type="primary" @click="mirroringSure('mirroringform')">确 定</el-button>
             </span>
         </el-dialog>
-        <el-dialog
-            title="删除镜像"
-            :visible.sync="deleteDevicedialogVisible"
-            width="50%"
-            :before-close="handleClose">
-                <i class="el-icon-warning"></i> 删除镜像后不可恢复，确定删除吗？
-            <span slot="footer" class="dialog-footer">
-                <el-button @click="deleteDevicedialogVisible = false">取 消</el-button>
-                <el-button type="primary" @click="sureDeleteDevice">确 定</el-button>
-            </span>
-        </el-dialog>
-         <el-dialog
-            title="删除应用"
-            :visible.sync="deleteApplydialogVisible"
-            width="50%"
-            :before-close="handleClose">
-                <i class="el-icon-warning"></i> 删除应用后不可恢复，确定删除吗？
-            <span slot="footer" class="dialog-footer">
-                <el-button @click="deleteApplydialogVisible = false">取 消</el-button>
-                <el-button type="primary" @click="sureDeleteApply()">确 定</el-button>
-            </span>
+        <el-dialog title="镜像信息详情：" :visible.sync="mirroingDialogFormVisible" width="40%">
+            <el-form :model="mirrDetailForm">
+                <el-row>
+                    <el-col :span=12>
+                            <el-form-item label="镜像名称:" >
+                            {{mirrDetailForm.name}}
+                        </el-form-item>
+                    </el-col>
+                        <el-col :span=12>
+                            <el-form-item label="类型:" >
+                            {{mirrDetailForm.type}}
+                        </el-form-item>
+                    </el-col>
+                </el-row>
+                <el-row>
+                    <el-col :span=12>
+                            <el-form-item label="版本:" >
+                            {{mirrDetailForm.version}}
+                        </el-form-item>
+                    </el-col>
+                        <el-col :span=12>
+                            <el-form-item label="状态:" >
+                            {{mirrDetailForm.status}}
+                        </el-form-item>
+                    </el-col>
+                </el-row>
+                <el-row>
+                    <el-col :span=12>
+                            <el-form-item label="创建时间:" >
+                            {{mirrDetailForm.createTime}}
+                        </el-form-item>
+                    </el-col>
+                        <el-col :span=12>
+                            <el-form-item label="创建人:" > 
+                            {{mirrDetailForm.createPeople}} 
+                        </el-form-item> 
+                    </el-col>
+                </el-row>             
+            </el-form>
         </el-dialog>
     </div>
 </template>
@@ -453,6 +574,16 @@ export default {
         bushucurrentPage:1,
         bushuPageSize:10,
         deployDlgVisible:false,
+        deplyDialogFormVisible:false,
+        deployDetailForm:{
+            name:'',
+            device:'',
+            version:'',
+            status:'',
+            num:'',
+            startTime:'',
+            stopTime:'',
+        },
         deployForm:{
             id:"",
             deviceName:"",
@@ -462,17 +593,30 @@ export default {
             app:"",
         },
         selectApp:"",
+        appID:'',
+        appStatus:'',
         appSelectList:[],
         appList:[],
+        applyDetailForm:{
+            name:'',
+            type:'',
+            info:'', 
+            status:'', 
+            createTime:'', 
+            updateTime:'',
+        },
         mirtotal:1,
         applytotal:1,
         bushutotal:1,
+        qiaowei:'',
         applyAdd:false,//应用添加按钮
+        applyDialogFormVisible:false,
         ImageUpload:false,//镜像上传按钮
         deployTableData: [],
         applyTableData:[],
         mirroringTableData:[],
         mirroringDialogVisible:false,
+        mirroingDialogFormVisible:false,
         labelPosition: 'right',
         mirroringform: {
           name: '',
@@ -506,6 +650,14 @@ export default {
           name: '',
           versions: '',
           textarea:'',
+        },
+        mirrDetailForm:{
+            name:'', 
+            type:'', 
+            version:'', 
+            status:'',
+            createTime:'', 
+            createPeople:'',
         },
         idArr:[],
         deleteDevicedialogVisible:false,
@@ -637,16 +789,185 @@ export default {
         //部署详情
         deployDetail(scope){
             console.log(scope);
+            let that = this;
+            that.deplyDialogFormVisible = true;
+            that.deployDetailForm.name = scope.device.name;
+            that.deployDetailForm.device = scope.statesdata;
+            that.deployDetailForm.version = scope.device.hostGroup.version;
+            that.deployDetailForm.status = scope.devstate;
+            that.deployDetailForm.num = scope.appNum;
+            that.deployDetailForm.startTime = scope.device.lastUpTime;
+            that.deployDetailForm.stopTime = scope.device.lastHeardTime;
+        },
+        //按钮启动
+        startDeploy(data){
+            let that = this;
+            that.$confirm('此操作将启动设备, 是否继续?', '提示', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning'
+            }).then(() => {
+            that.fncStartDeploy(data)
+            }).catch(() => {
+            console.log('取消了删除')
+           })
+        }, 
+        fncStartDeploy(scope){
+            let that = this;
+            console.log(scope)
+            that.appID = scope.device.id;
+            let startID = {
+                'id': that.appID ,
+                'status':0
+            }
+            that.$axios({
+                method:'post',
+                url:'/wlsbgl/device/updateDeviceStatus',
+                data:that.qs.stringify(startID)
+            })
+            .then((res)=>{
+                console.log(res.data)
+                that.getbushuData();
+                if(res.data.status  == '200'){
+                    that.$notify({
+                        title: '成功',
+                        message: res.data.msg,
+                        type: 'success'
+                    });
+                    }else{
+                    that.$notify.error({
+                        title: '失败',
+                        message: res.data.msg,
+                    });
+                }
+            })
+            .catch((err)=>{
+                console.log(err);
+            })
+        },
+        //按钮停止
+        stopDeploy(data){
+            let that = this;
+            that.$confirm('此操作将停止设备, 是否继续?', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+                }).then(() => {
+                that.fncStopDeploy(data)
+                }).catch(() => {
+                console.log('取消了删除')
+           })
+        },
+        fncStopDeploy(scope){
+            let that = this;
+            console.log(scope)
+            that.appID = scope.device.id;
+            let startID = {
+                'id': that.appID ,
+                'status':1
+            }
+            that.$axios({
+                method:'post',
+                url:'/wlsbgl/device/updateDeviceStatus',
+                data:that.qs.stringify(startID)
+            })
+            .then((res)=>{
+                console.log(res.data)
+                that.getbushuData();
+                if(res.data.status  == '200'){
+                    that.$notify({
+                        title: '成功',
+                        message: res.data.msg,
+                        type: 'success'
+                    });
+                    }else{
+                    that.$notify.error({
+                        title: '失败',
+                        message: res.data.msg,
+                    });
+                }
+            })
+            .catch((err)=>{
+                console.log(err);
+            })
         },
         //部署管理重启
-        deployReload(scope){
-            console.log(scope);
+        deployReload(data){
+            let that = this;
+            that.$confirm('此操作将重启设备, 是否继续?', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+                }).then(() => {
+                that.fncReployDeploy(data)
+                }).catch(() => {
+                console.log('取消了删除')
+           })
+        },
+        fncReployDeploy(scope){
+            let that = this;
+            console.log(scope)
+            that.appID = scope.device.id;
+            let startID = {
+                'id': that.appID ,
+                'status':2
+            }
+            that.$axios({
+                method:'post',
+                url:'/wlsbgl/device/updateDeviceStatus',
+                data:that.qs.stringify(startID)
+            })
+            .then((res)=>{
+                console.log(res.data)
+                that.getbushuData();
+                if(res.data.status  == '200'){
+                    that.$notify({
+                        title: '成功',
+                        message: res.data.msg,
+                        type: 'success'
+                    });
+                    }else{
+                    that.$notify.error({
+                        title: '失败',
+                        message: res.data.msg,
+                    });
+                }
+            })
+            .catch((err)=>{
+                console.log(err);
+            })
         },
         //部署管理 应用部署
         applicationDeployment(scope){
             console.log(scope);
             let that = this;
             that.deployDlgVisible = true;
+            that.qiaowei = scope.id; 
+            that.getYiAddApp();
+            that.deployForm.deviceName = scope.device.name;
+            that.deployForm.appVersion = scope.device.hostGroup.version;
+            that.deployForm.lastUpTime = scope.device.lastUpTime;
+            that.deployForm.lastStopTime = scope.device.lastHeardTime;
+            that.deployForm.id = scope.devstate;
+        },
+        //获取已经添加的app
+        getYiAddApp(){
+            let that = this;
+            let hostID = {
+                'hostId':that.qiaowei
+            }
+            that.$axios({
+                method:'post',
+                url:'/wlsbgl/container/containerApp',
+                data:that.qs.stringify(hostID)
+            })
+            .then((res)=>{
+                console.log(res.data)
+                that.appSelectList = res.data;
+            })
+            .catch((err)=>{
+                console.log(err);
+            })
         },
         async addApp(){
             let that = this;
@@ -657,33 +978,38 @@ export default {
             }
             let findFlag = false
             that.appSelectList.forEach((v)=>{
-                if(v.id == that.selectApp) {
+                console.log('判断appSelectList')
+                console.log(v)
+                if(v.appId == that.selectApp) {
                     findFlag = true
                     this.$message.warning('该应用已添加')
                 }
             })
             if(!findFlag){
-                let addNewApplyData = ""
-                let addAppData = ""
-                that.appList.forEach((v)=>{
-                    if(v.id == that.selectApp) {
-                    addAppData = v;
-                    that.appSelectList.push(v)
-                    addNewApplyData = {
-                        'hostId':that.deployForm.id,
+                // let addNewApplyData = ""
+                // let addAppData = ""
+                // that.appList.forEach((v)=>{
+                //     console.log('判断appSelectList')
+                //     console.log(v)
+                //     if(v.id == that.selectApp) {
+                //     addAppData = v;
+                //     that.appSelectList.push(v)
+                    
+                //     }
+                // })
+                let addNewApplyData = {
+                        'hostId':that.qiaowei,
                         'appId':that.selectApp,
                     }
-                    }
-                })
                 if(addNewApplyData != ""){
-                let addRs = await addNewApply(addNewApplyData);
-                console.log(addRs)
-                if(addRs.status == 200){
-                    addAppData["containerId"] = addRs.data.data
-                    that.$notify.success({
-                    title: '成功',
-                    message: '新增成功',
-                    });
+                    let addRs = await addNewApply(addNewApplyData);
+                    console.log(addRs)
+                    if(addRs.status == '200'){
+                        that.getYiAddApp();
+                        that.$notify.success({
+                        title: '成功',
+                        message: '新增成功',
+                     });
                 }
                 else{
                     that.$notify.error({
@@ -707,6 +1033,189 @@ export default {
                 .catch((err) => {
                     console.log(err)
                 });
+        },
+        //启动app\
+        deployItem (data) {
+            let that = this
+            this.$confirm('此操作将启动应用, 是否继续?', '提示', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning'
+            }).then(() => {
+            that.fncDeployItem(data)
+            }).catch(() => {
+            console.log('取消了删除')
+        })
+        },
+        fncDeployItem(scope){
+            let that = this;
+            console.log(scope)
+            that.appID = scope.id;
+            let startID = {
+                'id': that.appID ,
+                'status':0
+            }
+            that.$axios({
+                method:'post',
+                url:'/wlsbgl/container/updateContainer',
+                data:that.qs.stringify(startID)
+            })
+            .then((res)=>{
+                console.log(res.data)
+                that.getYiAddApp();
+                if(res.data.status  == '200'){
+                    that.$notify({
+                        title: '成功',
+                        message: res.data.msg,
+                        type: 'success'
+                    });
+                    }else{
+                    that.$notify.error({
+                        title: '失败',
+                        message: res.data.msg,
+                    });
+                }
+            })
+            .catch((err)=>{
+                console.log(err);
+            })
+        },
+        //停止app
+        stopItem (data) {
+            let that = this
+            this.$confirm('此操作将关闭应用, 是否继续?', '提示', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning'
+            }).then(() => {
+            that.funStopItem(data)
+            }).catch(() => {
+            console.log('取消了删除')
+        })
+        },
+        funStopItem(scope){
+            let that = this;
+            console.log(scope)
+            that.appID = scope.id;
+            let startID = {
+                'id': that.appID ,
+                'status':1
+            }
+            that.$axios({
+                method:'post',
+                url:'/wlsbgl/container/updateContainer',
+                data:that.qs.stringify(startID)
+            })
+            .then((res)=>{
+                console.log(res.data)
+                that.getYiAddApp();
+                if(res.data.status  == '200'){
+                    that.$notify({
+                        title: '成功',
+                        message: res.data.msg,
+                        type: 'success'
+                    });
+                    }else{
+                    that.$notify.error({
+                        title: '失败',
+                        message: res.data.msg,
+                    });
+                }
+            })
+            .catch((err)=>{
+                console.log(err);
+            })
+        },
+        //重启app
+         refresh (data) {
+            let that = this
+            this.$confirm('此操作将重启应用, 是否继续?', '提示', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning'
+            }).then(() => {
+            that.funRefresh(data)
+            }).catch(() => {
+            console.log('取消了删除')
+        })
+        },
+        funRefresh(scope){
+            let that = this;
+            console.log(scope)
+            that.appID = scope.id;
+            let startID = {
+                'id': that.appID ,
+                'status':2
+            }
+            that.$axios({
+                method:'post',
+                url:'/wlsbgl/container/updateContainer',
+                data:that.qs.stringify(startID)
+            })
+            .then((res)=>{
+                console.log(res.data)
+                that.getYiAddApp();
+                if(res.data.status  == '200'){
+                    that.$notify({
+                        title: '成功',
+                        message: res.data.msg,
+                        type: 'success'
+                    });
+                    }else{
+                    that.$notify.error({
+                        title: '失败',
+                        message: res.data.msg,
+                    });
+                }
+            })
+            .catch((err)=>{
+                console.log(err);
+            })
+        },
+        //删除app
+        removeApp(data) {
+            let that = this
+            this.$confirm('此操作将删除应用, 是否继续?', '提示', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning'
+            }).then(() => {
+            that.funDelApp(data)
+            }).catch(() => {
+            console.log('取消了删除')
+        })
+        },
+        funDelApp(scope){
+            let that = this;
+            console.log(scope)
+            that.appID = scope.id;
+            let startID = {
+                'id': that.appID ,
+            }
+            that.$axios({
+                method:'post',
+                url:'/wlsbgl/container/deleteContainer',
+                data:that.qs.stringify(startID)
+            })
+            .then((res)=>{
+                console.log(res.data)
+                that.getYiAddApp();
+                if(res.data.status  == '200'){
+                    that.$notify({
+                        title: '成功',
+                        message: res.data.msg,
+                        type: 'success'
+                    });
+                    }else{
+                    that.$notify.error({
+                        title: '失败',
+                        message: res.data.msg,
+                    });
+                }
+            })
+            .catch((err)=>{
+                console.log(err);
+            })
         },
         //获取所有应用
         async getApplyData(){
@@ -776,16 +1285,6 @@ export default {
             console.log(value.join(','))
             that.idArr = value.join(',');
         },
-        // handleCheckedCitiesChange(value) {
-        //     let that = this;
-        //     console.log(value)
-        //     let idList = [];
-        //     for(let i =0;i<value.length;i++){
-        //         idList.push(value[i].id)
-        //     }
-        //     that.idArr = idList.join(',');
-        //     console.log( that.idArr)
-        //    },
         //应用添加确定
         applySure(applyform){
             this.$refs[applyform].validate((valid) => {
@@ -841,6 +1340,18 @@ export default {
         applyDetail(scope){
             console.log(scope);
             let that = this;
+            that.applyDialogFormVisible = true;
+            that.applyDetailForm.name = scope.name
+            let imgInfo = scope.appImage;
+            let arr = []
+            for(let i=0;i<imgInfo.length;i++){
+                arr.push(imgInfo[i].iotImage.name)
+            }
+            that.applyDetailForm.info = arr.join(';')
+            that.applyDetailForm.type = scope.typeId;//类型 问题：返回的是什么 字符串还是数字 数字对应代表的是什么
+            that.applyDetailForm.status = scope.statusId;//状态
+            that.applyDetailForm.createTime = scope.createTime;
+            that.applyDetailForm.updateTime = scope.updateTime;
         },
         //应用删除
          applyDel (data) {
@@ -1025,6 +1536,14 @@ export default {
         //查看
         mirroringDetail:function(scope){
             console.log(scope)
+            let that = this;
+            that.mirroingDialogFormVisible = true;
+            that.mirrDetailForm.name = scope.name;
+            that.mirrDetailForm.type = scope.statesdata;
+            that.mirrDetailForm.version = scope.version;
+            // that.mirrDetailForm.status = scope.name;  //状态  目前不确定
+            that.mirrDetailForm.createTime = scope.createTime;
+            that.mirrDetailForm.createPeople = scope.iotUser.name;
         },
         //删除
         mirroringDel (data) {
@@ -1121,7 +1640,7 @@ export default {
     height: 131px;
     // padding-left: 25px;
     .appimage_image{
-        width: 100%;
+         width: 100%;
          height: 131px;
     }
 }

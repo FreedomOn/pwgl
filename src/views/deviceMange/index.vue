@@ -136,8 +136,7 @@
           <template slot-scope="scope">
             <el-button-group>
               <el-button @click="mangeDetail(scope.row)" type="info" icon="el-icon-info"  size="small">详情</el-button>
-              <!-- <el-button @click="mangeState(scope.row)" type="text"  size="small">|状态</el-button> -->
-              <el-button @click="mangeBushu(scope.row)"  type="primary" icon="el-icon-setting" size="small">部署</el-button>
+              <!-- <el-button @click="mangeBushu(scope.row)"  type="primary" icon="el-icon-setting" size="small">部署</el-button> -->
               <el-button @click="mangedelete(scope.row)" type="danger" icon="el-icon-delete" size="small">删除</el-button>
               <el-button @click="mangeupdate(scope.row)" type="primary" icon="el-icon-edit" size="small">编辑</el-button> 
             </el-button-group>
