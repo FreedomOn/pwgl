@@ -942,6 +942,7 @@ export default {
             console.log(scope);
             let that = this;
             that.deployDlgVisible = true;
+            that.selectApp = '';
             that.qiaowei = scope.id; 
             that.getYiAddApp();
             that.deployForm.deviceName = scope.device.name;
