@@ -111,7 +111,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
-
+import { getDeviceNumData,getDeviceTypeData} from '@/api/info'
 export default {
   name: 'dashboard',    
   mounted() {
@@ -119,15 +119,19 @@ export default {
     this.getConType();
     this.getDeviceType();
     this.getDeviceGroup();
+    this.getDeviceNum();
+    this.getDeviceTypehaha();
   },
   methods: {
       //设备数量趋势选择时间段
     deviceSelTime(value){
         // console.log(value);
-        console.log(this.deviceValue);
+        console.log(this.deviceValue[0],this.deviceValue[1]);
+        this.getDeviceNum();
     },
     deviceTypeSelTime(value){
         console.log(this.deviceTypeValue)
+        this.getDeviceTypehaha();
     },
     //获取应用统计 1.镜像数量 2.应用数量 3. 容器设备数量
     getAllNum(){
@@ -195,8 +199,28 @@ export default {
             console.log(err)
         });
     },
-    
-    
+    //设备数量趋势  
+    async getDeviceNum(){ 
+        let that = this;
+        let time = {
+            'startTime': this.deviceValue[0] ,
+            'endTime':this.deviceValue[1],
+        }
+        let deviceNum = await  getDeviceNumData(time)
+        console.log(deviceNum);
+        this.deviceLineChartData.rows = deviceNum;
+    },
+    // 设备状态趋势
+    async getDeviceTypehaha(){
+        let that = this;
+        let time = {
+            'startTime': this.deviceTypeValue[0] ,
+            'endTime':this.deviceTypeValue[1],
+        }
+        let deviceType = await  getDeviceTypeData(time)
+        console.log(deviceType);
+        this.deviceTypeLineChartData.rows = deviceType; 
+    },
   },
   
   data () {  
@@ -251,12 +275,7 @@ export default {
       //设备分组数据
        piechartDataGroup: {
             columns: [],
-            rows: [
-                // { '设备分组': '东区', '设备个数': 1393 },
-                // { '设备分组': '南区', '设备个数': 3530 },
-                // { '设备分组': '西区', '设备个数': 2530 },
-                // { '设备分组': '北区', '设备个数': 4530 },
-            ]
+            rows: []
         },
         //容器状态统计数据
         histchartData: {
@@ -265,27 +284,13 @@ export default {
         },
         //设备数量趋势数据
         deviceLineChartData: {
-            columns: ['日期', '网管设备', '终端设备', ],
-            rows: [
-                { '日期': '2018-01-01', '网管设备': 1393, '终端设备': 1093, },
-                { '日期': '2018-01-02', '网管设备': 3530, '终端设备': 3230, },
-                { '日期': '2018-01-03', '网管设备': 2923, '终端设备': 2623, },
-                { '日期': '2018-01-05', '网管设备': 1723, '终端设备': 1423, },
-                { '日期': '2018-01-10', '网管设备': 3792, '终端设备': 3492, },
-                { '日期': '2018-02-20', '网管设备': 4593, '终端设备': 4293, }   
-            ]
+            columns: ['日期', '网关设备', '终端设备', ],
+            rows: []
         },
         //设备状态趋势数据
         deviceTypeLineChartData:{
            columns: ['日期', '在线', '离线', '故障'],
-            rows: [
-            { '日期': '2018-01-01', '在线': 1393, '离线': 1093, '故障': 1121 },
-            { '日期': '2018-01-02', '在线': 3530, '离线': 3230, '故障': 2122 },
-            { '日期': '2018-01-03', '在线': 2923, '离线': 2623, '故障': 2222 },
-            { '日期': '2018-01-05', '在线': 1723, '离线': 1423, '故障': 3213 },
-            { '日期': '2018-01-10', '在线': 3792, '离线': 3492, '故障': 1231 },
-            { '日期': '2018-01-20', '在线': 4593, '离线': 4293, '故障': 4212 }
-            ]
+            rows: []
         },
         //时间选择
           pickerOptions: {
