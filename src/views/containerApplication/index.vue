@@ -115,11 +115,11 @@
                                     </span>             
                                 </template>
                                 </el-table-column>
-                                <el-table-column
+                                <!-- <el-table-column
                                 prop=""
                                 label="状态"
                                 width="130">
-                                </el-table-column>
+                                </el-table-column> -->
                                  <el-table-column
                                 prop="createTime"
                                 label="创建时间"
@@ -132,7 +132,7 @@
                                  <el-table-column
                                 fixed="right"
                                 label="操作"
-                                width="200"
+                                width="250"
                                 >
                                 <template slot-scope="scope">
                                     <el-button-group>
@@ -333,6 +333,7 @@
             </div>
             </el-form>
             <span slot="footer" class="dialog-footer">
+                <el-button @click="arrange()"  type="primary">编排</el-button>
                 <el-button @click="deployDlgVisible = false">关闭</el-button>
             </span>
             </el-dialog>
@@ -446,11 +447,11 @@
                                 {{applyDetailForm.info}}
                             </el-form-item>
                         </el-col>
-                         <el-col :span=12>
+                         <!-- <el-col :span=12>
                              <el-form-item label="状态:" >
                                 {{applyDetailForm.status}}
                             </el-form-item>
-                        </el-col>
+                        </el-col> -->
                     </el-row>
                     <el-row>
                         <el-col :span=12>
@@ -551,6 +552,20 @@
                 </el-row>             
             </el-form>
         </el-dialog>
+        <!-- 编排页面 -->
+        <el-dialog
+            title="请对应用进行编排:"
+            :visible.sync="arrangeDialogVisible"
+            width="85%"
+            :before-close="handleClose">
+            <div style="height:400px">
+
+            </div>
+            <span slot="footer" class="dialog-footer">
+                <el-button type="primary" @click="arrangeDialogVisible = false">确 定</el-button>
+                <el-button @click="arrangeDialogVisible = false">取 消</el-button>
+            </span>
+        </el-dialog>
     </div>
 </template>
 <script>
@@ -575,6 +590,7 @@ export default {
         bushuPageSize:10,
         deployDlgVisible:false,
         deplyDialogFormVisible:false,
+        arrangeDialogVisible:false,
         deployDetailForm:{
             name:'',
             device:'',
@@ -1054,7 +1070,8 @@ export default {
             that.appID = scope.id;
             let startID = {
                 'id': that.appID ,
-                'status':0
+                'status':0,
+                'hostId':scope.hostId
             }
             that.$axios({
                 method:'post',
@@ -1100,7 +1117,8 @@ export default {
             that.appID = scope.id;
             let startID = {
                 'id': that.appID ,
-                'status':1
+                'status':1,
+                'hostId':scope.hostId
             }
             that.$axios({
                 method:'post',
@@ -1146,7 +1164,8 @@ export default {
             that.appID = scope.id;
             let startID = {
                 'id': that.appID ,
-                'status':2
+                'status':2,
+                'hostId':scope.hostId
             }
             that.$axios({
                 method:'post',
@@ -1213,6 +1232,25 @@ export default {
                         message: res.data.msg,
                     });
                 }
+            })
+            .catch((err)=>{
+                console.log(err);
+            })
+        },
+        //编排
+        arrange(){
+            let that = this;
+            that.arrangeDialogVisible = true;
+            let hostID = {
+                'hostId':that.qiaowei
+            }
+            that.$axios({
+                method:'post',
+                url:'/wlsbgl/container/containerApp',
+                data:that.qs.stringify(hostID)
+            })
+            .then((res)=>{
+                console.log(res.data)
             })
             .catch((err)=>{
                 console.log(err);

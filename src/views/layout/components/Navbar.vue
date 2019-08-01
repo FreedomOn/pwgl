@@ -214,6 +214,7 @@ export default {
      handleSelect(key, keyPath) {
         localStorage.removeItem("activetab")
         localStorage.removeItem("sysactivetab")
+         localStorage.removeItem("configtab")
         console.log(key, keyPath);
         let aa = key;
         localStorage.setItem('haha', aa);

@@ -62,10 +62,13 @@
                 </el-button>
                 <el-dropdown-menu slot="dropdown">
                     <el-dropdown-item command="aaa">
-                        批量重启
+                        批量启动
                     </el-dropdown-item>
                     <el-dropdown-item command="bbb">    
                         批量停止
+                    </el-dropdown-item>
+                    <el-dropdown-item command="ccc">    
+                        批量重启
                     </el-dropdown-item>
                 </el-dropdown-menu>
             </el-dropdown>
@@ -203,27 +206,25 @@
                   </el-select>
                 </el-form-item> 
               </el-col>
-          </el-row>
-          <el-row>
-              <el-col :span="12">
+               <el-col :span="12">
                   <el-form-item label="经度" prop='jingdu'>
                   <el-input v-model="addNetwork.jingdu" clearable placeholder="请输入..." style="width:327px"></el-input>
                   </el-form-item> 
               </el-col>
+          </el-row>
+          <el-row>    
               <el-col :span="12">
                   <el-form-item label="维度" prop='weidu'>
                   <el-input v-model="addNetwork.weidu" clearable placeholder="请输入..." style="width:300px"></el-input>
                   </el-form-item> 
               </el-col>
-          </el-row>
-           <el-row>
               <el-col :span="12">
                 <el-form-item label="描述" prop='textarea'>
                       <el-input
                       type="textarea"
                       :rows="2"
                       placeholder="请输入内容"
-                      style="width:750px"
+                      style="width:330px"
                       v-model="addNetwork.textarea">
                     </el-input>
                   </el-form-item> 
@@ -244,14 +245,12 @@
                   </el-form-item> 
               </el-col>
           </el-row>
-           <el-row>
-              <el-col :span="12">
+            <el-row>
+              <el-col :span="3">
                   <el-form-item  prop='checked'>
                     <el-checkbox v-model="addNetwork.checked" @change="checkedChange()">容器支持</el-checkbox>
                   </el-form-item> 
               </el-col>
-          </el-row>
-            <el-row>
               <el-col :span="12">
                   <el-form-item label="容器版本" prop='container'>
                   <!-- <el-input v-model="addNetwork.container" clearable :disabled="vrnoclick" placeholder="请输入..." style="width:300px"></el-input> -->
@@ -307,27 +306,25 @@
                   </el-select>
                 </el-form-item> 
               </el-col>
-          </el-row>
-          <el-row>
-              <el-col :span="12">
+                <el-col :span="12">
                   <el-form-item label="经度" prop='jingdu'>
                   <el-input v-model="updateNetwork.jingdu" clearable placeholder="请输入..." style="width:300px"></el-input>
                   </el-form-item> 
               </el-col>
+          </el-row>
+          <el-row>
               <el-col :span="12">
                   <el-form-item label="维度" prop='weidu'>
                   <el-input v-model="updateNetwork.weidu" clearable placeholder="请输入..." style="width:300px"></el-input>
                   </el-form-item> 
               </el-col>
-          </el-row>
-           <el-row>
               <el-col :span="12">
                 <el-form-item label="描述" prop='textarea'>
                       <el-input
                       type="textarea"
                       :rows="2"
                       placeholder="请输入内容"
-                      style="width:750px"
+                      style="width:310px"
                       v-model="updateNetwork.textarea">
                     </el-input>
                   </el-form-item> 
@@ -348,14 +345,12 @@
                   </el-form-item> 
               </el-col>
           </el-row>
-           <el-row>
-              <el-col :span="12">
+            <el-row>
+              <el-col :span="3">
                   <el-form-item  prop='checked'>
                     <el-checkbox v-model="updateNetwork.checked" @change="updatecheckedChange()">容器支持</el-checkbox>
                   </el-form-item> 
               </el-col>
-          </el-row>
-            <el-row>
               <el-col :span="12">
                   <el-form-item label="容器版本" prop='container'>
                     <!-- <el-input v-model="updateNetwork.container" clearable :disabled="updatenoclick" placeholder="请输入..." style="width:300px"></el-input> -->
@@ -384,10 +379,11 @@
       <el-tabs type="border-card" @tab-click="handleClick"  v-model="activeName" style="height:540px">
         <el-tab-pane label="基本信息" name="first" class="detailInfo">
           <el-row>
-             <el-col :span="18" class="detailname">{{terminalDevice}}</el-col>
-             <el-col :span="6">
-               <el-button type="primary">重启</el-button>
-               <el-button type="primary">更新</el-button>
+             <el-col :span="16" class="detailname">{{terminalDevice}}</el-col>
+             <el-col :span="8">
+               <el-button type="primary" @click="deviceStart()" :disabled="isStart">启动</el-button>
+               <el-button type="primary"  @click="deviceClose()" :disabled="!isStart">关闭</el-button>
+               <el-button type="danger"  @click="deviceRestart()" :disabled="!isStart">重启</el-button>
              </el-col>
           </el-row>
           <div class="basicInfomation">
@@ -398,32 +394,30 @@
                           {{basicInfo.uuid}}
                   </el-form-item> 
                 </el-col>
-              </el-row>
-               <el-row>
                 <el-col :span="12">
                   <el-form-item label="设备编号:">
                           {{basicInfo.deviceNum}}
                   </el-form-item> 
                 </el-col>
+              </el-row>
+               <el-row>
                 <el-col :span="12">
                   <el-form-item label="序列号:">
                           {{basicInfo.orderNum}}
                   </el-form-item> 
                 </el-col>
-              </el-row>
-               <el-row>
                 <el-col :span="12">
                   <el-form-item label="设备类型:">
                           {{basicInfo.deviceType}}
                   </el-form-item> 
                 </el-col>
+              </el-row>
+               <el-row>
                 <el-col :span="12">
                   <el-form-item label="状态:">
                           {{basicInfo.state}}
                   </el-form-item> 
                 </el-col>
-              </el-row>
-               <el-row>
                 <el-col :span="12">
                   <el-form-item label="坐标:">
                           {{basicInfo.position}}
@@ -448,12 +442,14 @@
                           {{basicInfo.firmware}}
                   </el-form-item> 
                 </el-col>
+                 <el-col :span="12">
+                  <el-form-item label="描述信息:">
+                          {{basicInfo.desc}}
+                  </el-form-item> 
+                </el-col>
               </el-row>
             </el-form>
           </div>
-          <el-row>  
-              <span class="descInfo">描述信息:</span>  <span>{{basicInfo.desc}}</span>
-          </el-row>
         </el-tab-pane>
         <el-tab-pane label="配置信息" name="second" class="detailInfo">配置信息</el-tab-pane>
         <el-tab-pane label="事件列表" name="third" class="detailInfo">事件列表</el-tab-pane>
@@ -521,7 +517,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import { getDeviceData,addDevice,selectDevice,getGroup,addGroup,deleteGroup,delDevice,updateDevice} from '@/api/device'
+import { getDeviceData,addDevice,selectDevice,getGroup,addGroup,deleteGroup,delDevice,updateDevice,deviceStartAndClose,batchDeviceStartAndClose} from '@/api/device'
 let id=1000
 export default {
   name: 'dashboard',
@@ -553,12 +549,120 @@ export default {
      },
      //批量按钮组操作
      piliangmonhandleCommand(command){
+       let that = this;
        if(command == 'aaa'){
-          console.log('批量重启')
+          console.log('批量启动')     
+          that.batchDeviceStart();
         }else if(command == 'bbb'){
           console.log('批量停止')
+          that.batchDeviceClose();
+        }else if(command == 'ccc'){
+          console.log('批量重启')
+          that.batchDeviceReStart();
         }
      },
+    async batchDeviceStart(){
+      let that = this;
+      if(that.deviceMultipleSelection.length == 0) {
+        that.tipminerr('请选择需要启动的设备，最少选一条')
+        return false
+      }
+      let excelData = that.deviceMultipleSelection;
+      console.log(excelData);
+      let excelstr = '';
+      for(let i=0;i<excelData.length;i++){
+          console.log(excelData[i])  
+          excelstr = excelstr + excelData[i] + ','
+      }
+      console.log(excelstr)
+      let batchStartClose = {
+          'id':excelstr,
+          'status':0
+      }
+      let resdata = await batchDeviceStartAndClose(batchStartClose);
+      console.log(resdata)
+      if(resdata.status == '200'){
+        that.isStart = true;
+        that.$notify({
+          title: '成功',
+          message: resdata.msg,
+          type: 'success'
+        });
+      }else{
+        that.$notify.error({
+              title: '失败',
+              message: resdata.msg,
+          });
+        }
+    },
+    async batchDeviceClose(){
+      let that = this;
+      if(that.deviceMultipleSelection.length == 0) {
+        that.tipminerr('请选择需要停止的设备，最少选一条')
+        return false
+      }
+      let excelData = that.deviceMultipleSelection;
+      console.log(excelData);
+      let excelstr = '';
+      for(let i=0;i<excelData.length;i++){
+          console.log(excelData[i])  
+          excelstr = excelstr + excelData[i] + ','
+      }
+      console.log(excelstr)
+      let batchStartClose = {
+          'id':excelstr,
+          'status':1
+      }
+      let resdata = await batchDeviceStartAndClose(batchStartClose);
+      console.log(resdata)
+      if(resdata.status == '200'){
+        that.isStart = false;
+        that.$notify({
+          title: '成功',
+          message: resdata.msg,
+          type: 'success'
+        });
+      }else{
+        that.$notify.error({
+              title: '失败',
+              message: resdata.msg,
+          });
+        }
+    },
+    async batchDeviceReStart(){
+      let that = this;
+      if(that.deviceMultipleSelection.length == 0) {
+        that.tipminerr('请选择需要重启的设备，最少选一条')
+        return false
+      }
+      let excelData = that.deviceMultipleSelection;
+      console.log(excelData);
+      let excelstr = '';
+      for(let i=0;i<excelData.length;i++){
+          console.log(excelData[i])  
+          excelstr = excelstr + excelData[i] + ','
+      }
+      console.log(excelstr)
+      let batchStartClose = {
+          'id':excelstr,
+          'status':2
+      }
+      let resdata = await batchDeviceStartAndClose(batchStartClose);
+      console.log(resdata)
+      if(resdata.status == '200'){
+        that.isStart = true;
+        that.$notify({
+          title: '成功',
+          message: resdata.msg,
+          type: 'success'
+        });
+      }else{
+        that.$notify.error({
+              title: '失败',
+              message: resdata.msg,
+          });
+        }
+    },
     //获取所有设备
     async getData () {
       let that = this;
@@ -1092,11 +1196,78 @@ export default {
         that.basicInfo.updateTime = scope.updateTime;
         that.basicInfo.firmware = scope.firmwareVersion;
         that.basicInfo.desc = scope.description;
-      
+        that.basicInfo.id = scope.id;
       },
     //详情内tab切换
     handleClick(tab, event) {
         console.log(tab, event);
+    },
+    //详情内启动停止以及重启
+    async deviceStart(){ 
+      let that = this;
+      let startClose = {
+        'id': that.basicInfo.id,
+        'status':0
+      }
+      let resdata = await deviceStartAndClose(startClose);
+      console.log(resdata)
+      if(resdata.status == '200'){
+        that.isStart = true;
+        that.$notify({
+          title: '成功',
+          message: resdata.msg,
+          type: 'success'
+        });
+      }else{
+        that.$notify.error({
+              title: '失败',
+              message: resdata.msg,
+          });
+        }
+    }, 
+    async deviceClose(){
+        let that = this;
+        let startClose = {
+          'id': that.basicInfo.id,
+          'status':1
+        }
+        let resdata = await deviceStartAndClose(startClose);
+        console.log(resdata)
+        if(resdata.status == '200'){
+          that.isStart = false;
+          that.$notify({
+            title: '成功',
+            message: resdata.msg,
+            type: 'success'
+          });
+        }else{
+          that.$notify.error({
+                title: '失败',
+                message: resdata.msg,
+            });
+          }
+    }, 
+    async deviceRestart(){
+        let that = this;
+        let startClose = {
+          'id': that.basicInfo.id,
+          'status':2
+        }
+        let resdata = await deviceStartAndClose(startClose);
+        console.log(resdata)
+        if(resdata.status == '200'){
+          that.isStart = true;
+          that.$notify({
+            title: '成功',
+            message: resdata.msg,
+            type: 'success'
+          });
+        }else{
+          that.$notify.error({
+                title: '失败',
+                message: resdata.msg,
+            });
+          }
     },
     //状态
     mangeState(scope){
@@ -1384,10 +1555,14 @@ export default {
         let that = this;
         console.log(val);
         var arr = []
+        let deviceArr = []
         for (let i in val) {
             arr.push(val[i].uuid); //属性
+            deviceArr.push(val[i].id) //设备id
         }
         that.multipleSelection = arr;
+        that.deviceMultipleSelection = deviceArr;
+        console.log(that.deviceMultipleSelection)
         console.log(that.multipleSelection) 
     },
     //定义一些消息提示框
@@ -1543,6 +1718,7 @@ export default {
         nowTime:'',
         terminalDevice:'',//详情基本信息名字
         basicInfo:{ //详情基本信息
+          id:'',
           uuid:'',
           deviceNum:'',
           orderNum:'',
@@ -1621,6 +1797,7 @@ export default {
         selsctInput:'',
         loading:true,
         multipleSelection: [],
+        deviceMultipleSelection:[],
         adddialogVisible:false,
         conOptions:[],
         detailDialogVisible:false,
@@ -1684,6 +1861,7 @@ export default {
           container:"",
         },
         filedialogVisible:false,
+        isStart:false,
          fileform: {  // 表格导入
           'file': '',
           'filename': '',

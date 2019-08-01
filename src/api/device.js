@@ -140,3 +140,37 @@ export const deleteGroup = (delGroupData) =>{
            })
     })
 }
+//设备启动暂停接口
+export const deviceStartAndClose = (startClose) =>{
+    return new Promise((resolve,reject) =>{
+        request({
+            method:'post',
+            url:'/wlsbgl/device/updateDeviceStatus',
+            data: qs.stringify(startClose)  //将传递的参数变为字符形式
+          })
+           .then((res) => {
+               resolve(res.data)
+           })
+           .catch((err) => {
+               console.log(err);
+               reject(err)
+           })
+    })
+}
+//批量设备启动暂停接口
+export const batchDeviceStartAndClose = ( batchStartClose) =>{
+    return new Promise((resolve,reject) =>{
+        request({
+            method:'post',
+            url:'/wlsbgl/device/updateDeviceStatusAll',
+            data: qs.stringify(batchStartClose)  //将传递的参数变为字符形式
+          })
+           .then((res) => {
+               resolve(res.data)
+           })
+           .catch((err) => {
+               console.log(err);
+               reject(err)
+           })
+    })
+}
