@@ -121,3 +121,88 @@ export const delApplyDevice = (delData) => {
            })
     })
   }
+  //已经编排的应用
+export const arrangeYes = (yesData) => {
+    return new Promise((resolve, reject) => {
+        request({
+            method:'post',
+            url:'/wlsbgl/container/arrangeYes',
+            data: qs.stringify(yesData)  //将传递的参数变为字符形式
+          })
+           .then((res) => {
+               resolve(res.data)
+           })
+           .catch((err) => {
+               console.log(err);
+               reject(err)
+           })
+    })
+  }
+    //独立的应用
+export const arrangeNo = (noData) => { 
+    return new Promise((resolve, reject) => {
+        request({
+            method:'post',
+            url:'/wlsbgl/container/arrangeNo',
+            data: qs.stringify(noData)  //将传递的参数变为字符形式
+          })
+           .then((res) => {
+               resolve(res.data)
+           })
+           .catch((err) => {
+               console.log(err);
+               reject(err)
+           })
+    })
+  }
+  //把独立应用设置为编排应用 把编排应用设置为独立应用
+  export const arrangeChange = (changeData) => { 
+    return new Promise((resolve, reject) => {
+        request({
+            method:'post',
+            url:'/wlsbgl/container/arrangeAndOne',
+            data: qs.stringify(changeData)  //将传递的参数变为字符形式
+          })
+           .then((res) => {
+               resolve(res.data)
+           })
+           .catch((err) => {
+               console.log(err);
+               reject(err)
+           })
+    })
+  }
+//向上移动
+export const arrangeUp = (upData) => { 
+    return new Promise((resolve, reject) => {
+        request({
+            method:'post',
+            url:'/wlsbgl/container/lookUpContainer',
+            data: qs.stringify(upData)  //将传递的参数变为字符形式
+          })
+           .then((res) => {
+               resolve(res.data)
+           })
+           .catch((err) => {
+               console.log(err);
+               reject(err)
+           })
+    })
+  }
+  //向xia移动
+export const arrangeDown = (downData) => { 
+    return new Promise((resolve, reject) => {
+        request({
+            method:'post',
+            url:'/wlsbgl/container/lookDownContainer',
+            data: qs.stringify(downData)  //将传递的参数变为字符形式
+          })
+           .then((res) => {
+               resolve(res.data)
+           })
+           .catch((err) => {
+               console.log(err);
+               reject(err)
+           })
+    })
+  } 

@@ -557,10 +557,90 @@
             title="请对应用进行编排:"
             :visible.sync="arrangeDialogVisible"
             width="85%"
+           
             :before-close="handleClose">
-            <div style="height:400px">
+            <!-- <div style="height:400px;position:relative" ref="box">
+                <el-row>
+                    <el-col :span="8" v-for="(item,index) in arrangeTableData" :key="index" :offset="1" class="isActive">
+                        <div @click="getLine(item)" :class="item.show==true?'active':'hhhh'" :ref='item.name' >{{item.app.name}}[{{item.app.version}}]
+                              <i></i>
+                        </div>
 
-            </div>
+                      
+                    </el-col>
+                 </el-row>
+                 <canvas id="myCanvas" ref="myCanvas"></canvas>
+            </div> -->
+            <el-table
+                :data="arrangeTableData"
+                style="width: 100%"
+                height="250px">
+                <el-table-column
+                    prop="app.name"
+                    label="应用名称"
+                    width="220"
+                    >
+                </el-table-column>
+                <el-table-column
+                    prop="app.version"
+                    label="应用版本"
+                    width="220">
+                </el-table-column>
+                <el-table-column
+                        prop="createTime"
+                        label="创建时间"
+                        width="220">
+                    </el-table-column>
+                <el-table-column
+                    width="220"
+                    label="移动"
+                    fixed="right">
+                    <template slot-scope="scope"> 
+                        <el-tooltip class="item" effect="dark" content="上移" placement="top-start" >
+                        <el-button size="mini" type="success" icon="el-icon-caret-top"  @click="upAPP(scope.row)" :disabled="scope.$index == 0"></el-button>
+                        </el-tooltip>
+                        <el-tooltip class="item" effect="dark" content="下移" placement="top-start">
+                        <el-button size="mini" type="success" icon="el-icon-caret-bottom" @click="downAPP(scope.row)" :disabled="scope.$index == (arrangeTableData.length-1)"></el-button>
+                        </el-tooltip>
+                         <el-tooltip class="item" effect="dark" content="是否设置为独立应用？" placement="top-start">
+                        <el-button size="mini" type="success"  @click="duliAPP(scope.row)" >设为独立</el-button>
+                        </el-tooltip>
+                    </template>
+                </el-table-column>
+            </el-table>
+            <!--  -->
+            <div style="margin-top:30px;font-weight:600">独立应用：</div>
+             <el-table
+                :data="independentTableData"
+                style="width: 100%"
+                height="250px">
+                <el-table-column
+                    prop="app.name"
+                    label="应用名称"
+                    width="220"
+                    >
+                </el-table-column>
+                <el-table-column
+                    prop="app.version"
+                    label="应用版本"
+                    width="220">
+                </el-table-column>
+                <el-table-column
+                        prop="createTime"
+                        label="创建时间"
+                        width="220">
+                    </el-table-column>
+                <el-table-column
+                    width="120"
+                    label="操作"
+                    fixed="right">
+                    <template slot-scope="scope"> 
+                        <el-tooltip class="item" effect="dark" content="点击在上面表格进行移动编排" placement="top-start" >
+                        <el-button size="mini" type="success"   @click="arrangeAPP(scope.row)">进行编排</el-button>
+                        </el-tooltip>
+                    </template>
+                </el-table-column>
+            </el-table>
             <span slot="footer" class="dialog-footer">
                 <el-button type="primary" @click="arrangeDialogVisible = false">确 定</el-button>
                 <el-button @click="arrangeDialogVisible = false">取 消</el-button>
@@ -569,7 +649,7 @@
     </div>
 </template>
 <script>
-import { selectDeploy,selectMirring,applyAdd,applySelectapply,delDevice,delApplyDevice,addNewApply} from '@/api/containerApplication'
+import { selectDeploy,selectMirring,applyAdd,applySelectapply,delDevice,delApplyDevice,addNewApply,arrangeYes,arrangeNo,arrangeChange,arrangeUp,arrangeDown} from '@/api/containerApplication'
 export default {
   data() {
       return {
@@ -680,6 +760,11 @@ export default {
         delid:'',
         deleteApplydialogVisible:false,
         applyDelid:'',
+        arrangeOption:[],
+        arrangeTableData:[],
+        independentTableData:[],
+        lineItems:[],
+        line:[],
       };
     },
     mounted(){
@@ -981,6 +1066,17 @@ export default {
             .then((res)=>{
                 console.log(res.data)
                 that.appSelectList = res.data;
+                // that.arrangeTableData = res.data;
+                // let arr = res.data;
+                // let newArr = [];
+                // arr.forEach(element =>{
+                // element.show = false;
+                // element.name = 'line'+element.id;
+                // newArr.push(element)
+                // })
+                // console.log(newArr)
+                // that.arrangeTableData = newArr;
+                //  console.log(  that.arrangeTableData,' that.arrangeTableData')
             })
             .catch((err)=>{
                 console.log(err);
@@ -1210,7 +1306,9 @@ export default {
             console.log(scope)
             that.appID = scope.id;
             let startID = {
-                'id': that.appID ,
+                'id': that.appID,
+                'usability':scope.usability,
+                'arrange':scope.arrange
             }
             that.$axios({
                 method:'post',
@@ -1238,24 +1336,160 @@ export default {
             })
         },
         //编排
-        arrange(){
+        async arrange(){
             let that = this;
             that.arrangeDialogVisible = true;
-            let hostID = {
+            let yesData = {
                 'hostId':that.qiaowei
             }
-            that.$axios({
-                method:'post',
-                url:'/wlsbgl/container/containerApp',
-                data:that.qs.stringify(hostID)
-            })
-            .then((res)=>{
-                console.log(res.data)
-            })
-            .catch((err)=>{
-                console.log(err);
-            })
+            let arrangeyes = await arrangeYes(yesData);
+            console.log(arrangeyes)
+            that.arrangeTableData= arrangeyes;
+            let noData = {
+                'hostId':that.qiaowei
+            }
+            let arrangeno = await arrangeNo(noData);
+            console.log(arrangeno)
+            that.independentTableData = arrangeno;
         },
+        //将独立应用 转换成可进行编排的应用
+        async arrangeAPP(scope){
+            let that = this;
+            console.log(scope);
+            let changeData = {
+                'id':scope.id,
+                'hostId': scope.hostId,
+                'arrange':scope.arrange,
+                'usability':0
+            }
+            let arrangenodata = await arrangeChange(changeData)
+            console.log(arrangenodata)
+            if(arrangenodata.status == 200){
+                that.arrange();
+            }
+        },
+        //将可编排的应用转换为独立应用
+        async duliAPP(scope){
+            let that = this;
+            console.log(scope);
+            let changeData = {
+                'id':scope.id,
+                'hostId': scope.hostId,
+                'arrange':scope.arrange,
+                'usability':1
+            }
+            let arrangeyesdata = await arrangeChange(changeData)
+            console.log(arrangeyesdata)
+            if(arrangeyesdata.status == 200){
+                that.arrange();
+            }
+        },
+        //移动
+        async upAPP(scope){
+            console.log(scope);
+            let that = this;
+            let upData= {
+                'id':scope.id,
+                'hostId': scope.hostId,
+                'arrange':scope.arrange,
+                'appId':scope.appId
+            }
+            let lookupdata = await arrangeUp(upData);
+            console.log(lookupdata)
+            if(lookupdata.status == 200){
+                that.arrange();
+            }
+        }, 
+        async downAPP(scope){
+            console.log(scope);
+            let that = this;
+            let downData= {
+                'id':scope.id,
+                'hostId': scope.hostId,
+                'arrange':scope.arrange,
+                'appId':scope.appId
+            }
+            let lookdowndata = await arrangeDown(downData);
+            console.log(lookdowndata)
+            if(lookdowndata.status == 200){ 
+                that.arrange();
+            }
+
+        },
+        getLine(item){
+            console.log(item.show,'showshow')
+            item.show = !item.show;
+             console.log(item.show,'sss',this.arrangeTableData)
+             let jj = this.arrangeTableData;
+             this.arrangeTableData= []
+             this.arrangeTableData = jj
+            //以item。name作为唯一标识
+            this.lineItems.push(item.id);
+            console.log(this.lineItems,' this.lineItems')
+            if(this.lineItems.length==2){
+                //数组集满两个，就push line数组画线，如果点击后取消，则清空数组，不push
+                if(this.lineItems[0] == this.lineItems[1]){
+                    this.lineItems=[]
+                    return;
+                }
+            this.line.push(this.lineItems)
+            //push 入line数组，就清空
+            console.log(this.line,'line')
+            this.lineItems=[]
+            this.drawLine()
+            }
+        },
+        drawLine(){
+            let c=this.$refs.myCanvas;
+            c.width = this.$refs.box.clientWidth;
+            c.height = this.$refs.box.clientHeight;
+            let ctx=c.getContext("2d");
+            let boxx = this.$refs.box;
+            let _x = boxx.offsetLeft;
+            let _y = boxx.offsetTop;
+            //带有坐标的画线数组
+            let lineArr=[];
+            //数组去重
+            let result=[]
+                let obj={}
+                for(let i of this.line){
+                if(!obj[i]){
+                    result.push(i) 
+                    obj[i] = 1
+                }
+                }
+                console.log(result,'去重后的数组')
+                for(let j=0;j<result.length;j++){
+                console.log(result[j][0])
+                let a ='line'+result[j][0];
+                let b = 'line'+result[j][1];
+                let dom_l = this.$refs[a][0];
+                console.log(dom_l)
+                let dom_r = this.$refs[b][0];
+                lineArr[j] = {};
+                lineArr[j].left = {};
+                lineArr[j].right = {};
+                lineArr[j].left.x = Math.abs(dom_l.offsetLeft - _x);
+                lineArr[j].left.y = Math.abs(dom_l.offsetTop - _y);
+                lineArr[j].right.x = Math.abs(dom_r.offsetLeft - _x);
+                lineArr[j].right.y = Math.abs(dom_r.offsetTop - _y);
+            }
+            console.log(lineArr,'llll');
+            ctx.clearRect(0,0,c.clientWidth,c.clientHeight);
+            for(let i=0;i<lineArr.length;i++){
+                ctx.beginPath();
+                ctx.lineCap="round";
+                ctx.strokeStyle = "red";
+                ctx.lineWidth = "1";
+                ctx.moveTo(lineArr[i].left.x+15,lineArr[i].left.y+15);
+                ctx.lineTo(lineArr[i].right.x+15,lineArr[i].right.y+15);
+                ctx.stroke();
+                this.arrangeTableData.map(el=>{
+                    el.show = false;
+                })
+            }
+        },
+        
         //获取所有应用
         async getApplyData(){
             let that = this;
@@ -1683,4 +1917,24 @@ export default {
          height: 131px;
     }
 }
+.isActive{
+    i{
+        display: inline-block;
+        width: 10px;
+        height: 10px;
+        border: 1px solid #000;
+    }
+    .active i{
+        background-color: #000;
+    }
+}
+  #myCanvas{
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            top:0;
+            left: 0;
+            z-index: 100000;
+        }
 </style>

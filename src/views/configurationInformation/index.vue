@@ -77,7 +77,8 @@
                 </div>
             </el-tab-pane>
             <el-tab-pane label="传感器" name="two">
-                 <div class="header">
+                <div>传感器</div>
+                 <!-- <div class="header">
                     <span>
                         <el-button type="primary"  @click="addSensor()">新增传感器</el-button>
                     </span> 
@@ -85,8 +86,8 @@
                         <el-input v-model="sensorSelectInput"  placeholder="请输入传感器名字快速搜索" style="width:400px"></el-input>
                         <el-button type="primary" icon="el-icon-search"    @click="sensorSelect()">快速搜索</el-button>
                         </span>
-                </div>
-                <el-table
+                </div> -->
+                <!-- <el-table
                     :data="sensorTableData"
                     stripe
                     border
@@ -148,10 +149,11 @@
                     layout="total, sizes, prev, pager, next, jumper"
                     :total="sensortotal">
                     </el-pagination>
-                </div>
+                </div> -->
             </el-tab-pane>
             <el-tab-pane label="通讯信息" name="three">
-                 <div class="header">
+                <div>通讯信息</div>
+                 <!-- <div class="header">
                     <span>
                         <el-button type="primary"  @click="addInformation()">新增通讯信息</el-button>
                     </span> 
@@ -159,8 +161,8 @@
                         <el-input v-model="informationSelectInput"  placeholder="请输入通讯信息名称快速搜索" style="width:400px"></el-input>
                         <el-button type="primary" icon="el-icon-search"    @click="informationSelect()">快速搜索</el-button>
                         </span>
-                </div>
-                <el-table
+                </div> -->
+                <!-- <el-table
                     :data="informationTableData"
                     stripe
                     border
@@ -223,7 +225,7 @@
                     layout="total, sizes, prev, pager, next, jumper"
                     :total="informationtotal">
                     </el-pagination>
-                </div>
+                </div> -->
             </el-tab-pane>
         </el-tabs>
          <!-- 修改宿主机 -->
@@ -472,55 +474,67 @@
                         <el-input v-model="addinfoForm.name" clearable placeholder="请输入" style="width:270px"></el-input>
                         </el-form-item> 
                     </el-col>
-                    <el-col :span="12">
+                    <el-form-item label=" 设备名称:" prop="deviceName" >
+                        <el-select v-model="addinfoForm.deviceName" placeholder="请选择" style="width:300px" @change="infodeviceChange">
+                            <el-option
+                            v-for="item in arrdeviceOptions" 
+                            :key="item.id"
+                            :label="item.name"
+                            :value="item.id">
+                            </el-option> 
+                        </el-select>
+                     </el-form-item>
+                </el-row>   
+                 <el-row>
+                     <el-col :span="12">
                         <el-form-item label="通讯类型" prop='type'>
                             <el-radio v-model="addinfoForm.type" label="0">网关设备</el-radio>
                             <el-radio v-model="addinfoForm.type" label="1">终端设备</el-radio>
                         </el-form-item> 
                     </el-col>
-                </el-row>   
-                 <el-row>
                     <el-col :span="12">
                         <el-form-item label="通讯地址" prop='address, '>
                         <el-input v-model="addinfoForm.address" clearable placeholder="请输入" style="width:300px"></el-input>
                         </el-form-item> 
-                    </el-col>
-                    <el-col :span="12"> 
+                    </el-col>    
+                </el-row>    
+                <el-row>
+                     <el-col :span="12"> 
                         <el-form-item label="通讯端口" prop='port'>
                         <el-input v-model="addinfoForm.port" clearable placeholder="请输入" style="width:300px"></el-input>
                         </el-form-item> 
                     </el-col>
-                </el-row>    
-                <el-row>
                     <el-col :span="12">
                         <el-form-item label="通讯协议ID" prop='protocolId, '>
                         <el-input v-model="addinfoForm.protocolId" clearable placeholder="请输入" style="width:300px"></el-input>
                         </el-form-item> 
-                    </el-col>
+                    </el-col>               
+                </el-row>  
+                <el-row>
                     <el-col :span="12"> 
                         <el-form-item label="连接字符串" prop='connString'>
                         <el-input v-model="addinfoForm.connString" clearable placeholder="请输入" style="width:300px"></el-input>
                         </el-form-item> 
                     </el-col>
-                </el-row>  
-                <el-row>
                     <el-col :span="12">
                         <el-form-item label="扩展信息1" prop='ext1, '>
                         <el-input v-model="addinfoForm.ext1" clearable placeholder="请输入" style="width:300px"></el-input>
                         </el-form-item>
-                    </el-col>
+                    </el-col>     
+                </el-row> 
+                <el-row>
                     <el-col :span="12"> 
                         <el-form-item label="扩展信息2" prop='ext2'>
                         <el-input v-model="addinfoForm.ext2" clearable placeholder="请输入" style="width:300px"></el-input>
                         </el-form-item> 
                     </el-col>
-                </el-row> 
-                <el-row>
                     <el-col :span="12">
                         <el-form-item label="服务器地址" prop='server, '>
                         <el-input v-model="addinfoForm.server" clearable placeholder="请输入" style="width:300px"></el-input>
                         </el-form-item> 
                     </el-col>
+                </el-row> 
+                <el-row>
                     <el-col :span="12"> 
                         <el-form-item label="服务器端口" prop='serverPort'>
                         <el-input v-model="addinfoForm.serverPort" clearable placeholder="请输入" style="width:300px"></el-input>
@@ -547,60 +561,75 @@
                         </el-form-item> 
                     </el-col>
                     <el-col :span="12">
+                        <el-form-item label=" 设备名称:" prop="deviceName">
+                            <el-select v-model="updateinfoForm.deviceName" placeholder="请选择" style="width:300px" @change="updateinfodeviceChange">
+                                <el-option
+                                v-for="item in updatearrdeviceOptions" 
+                                :key="item.id"
+                                :label="item.name"
+                                :value="item.id">
+                                </el-option> 
+                            </el-select>
+                        </el-form-item>
+                      </el-col>
+                </el-row>   
+                 <el-row>
+                    <el-col :span="12">
                         <el-form-item label="通讯类型" prop='type'>
                             <el-radio v-model="updateinfoForm.type" label="0">网关设备</el-radio>
                             <el-radio v-model="updateinfoForm.type" label="1">终端设备</el-radio>
                         </el-form-item> 
                     </el-col>
-                </el-row>   
-                 <el-row>
                     <el-col :span="12">
                         <el-form-item label="通讯地址" prop='address, '>
                         <el-input v-model="updateinfoForm.address" clearable placeholder="请输入" style="width:300px"></el-input>
                         </el-form-item> 
                     </el-col>
+
+                </el-row>    
+                <el-row>
                     <el-col :span="12"> 
                         <el-form-item label="通讯端口" prop='port'>
                         <el-input v-model="updateinfoForm.port" clearable placeholder="请输入" style="width:300px"></el-input>
                         </el-form-item> 
                     </el-col>
-                </el-row>    
-                <el-row>
                     <el-col :span="12">
                         <el-form-item label="通讯协议ID" prop='protocolId, '>
                         <el-input v-model="updateinfoForm.protocolId" clearable placeholder="请输入" style="width:300px"></el-input>
                         </el-form-item> 
                     </el-col>
+                </el-row>  
+                <el-row>
                     <el-col :span="12"> 
                         <el-form-item label="连接字符串" prop='connString'>
                         <el-input v-model="updateinfoForm.connString" clearable placeholder="请输入" style="width:300px"></el-input>
                         </el-form-item> 
                     </el-col>
-                </el-row>  
-                <el-row>
                     <el-col :span="12">
                         <el-form-item label="扩展信息1" prop='ext1, '>
                         <el-input v-model="updateinfoForm.ext1" clearable placeholder="请输入" style="width:300px"></el-input>
                         </el-form-item>
                     </el-col>
+                </el-row> 
+                <el-row>
                     <el-col :span="12"> 
                         <el-form-item label="扩展信息2" prop='ext2'>
                         <el-input v-model="updateinfoForm.ext2" clearable placeholder="请输入" style="width:300px"></el-input>
                         </el-form-item> 
                     </el-col>
-                </el-row> 
-                <el-row>
                     <el-col :span="12">
                         <el-form-item label="服务器地址" prop='server, '>
                         <el-input v-model="updateinfoForm.server" clearable placeholder="请输入" style="width:300px"></el-input>
                         </el-form-item> 
                     </el-col>
+                </el-row> 
+                  <el-row>
                     <el-col :span="12"> 
                         <el-form-item label="服务器端口" prop='serverPort'>
                         <el-input v-model="updateinfoForm.serverPort" clearable placeholder="请输入" style="width:300px"></el-input>
                         </el-form-item> 
                     </el-col>
-                </el-row> 
+                </el-row>
             </el-form>
             <span slot="footer" class="dialog-footer">
                 <el-button @click="updateIndoDialogVisible = false">取 消</el-button>
@@ -699,6 +728,8 @@ export default {
             },
             addinfoForm:{
                 name:'',
+                deviceName:'',
+                deviceNameid:'',
                 type:'',
                 address:'',
                 port:'',
@@ -709,10 +740,14 @@ export default {
                 server:'',
                 serverPort:'',
             },
+            arrdeviceOptions:[],
+            updatearrdeviceOptions:[],
             addIndoDialogVisible:false,
             updateinfoForm:{
                 id:'',
                 name:'',
+                deviceName:'',
+                deviceNameid:'',
                 type:'',
                 address:'',
                 port:'',
@@ -1134,10 +1169,13 @@ export default {
             }
         },
         //通讯新增
-        addInformation(){
+        async addInformation(){
             let that = this;
             that.addIndoDialogVisible = true;
+            let devicedata = await getAllDevice();
+            that.arrdeviceOptions = devicedata;
             that.addinfoForm.name = '';
+            that.addinfoForm.deviceName = '';
             that.addinfoForm.type = '';
             that.addinfoForm.address = '';
             that.addinfoForm.port = '';
@@ -1148,10 +1186,16 @@ export default {
             that.addinfoForm.server = '';
             that.addinfoForm.serverPort = '';
         },
+        infodeviceChange(val){
+            let that = this;
+            that.addinfoForm.deviceNameid = val;
+            console.log(that.addinfoForm.deviceNameid)
+        },
         async sureinfoAdd(){
             let that = this;
             let addinformationdata = {
                 'name':that.addinfoForm.name,
+                'device_id':that.addinfoForm.deviceNameid,
                 'type':that.addinfoForm.type,
                 'address':that.addinfoForm.address,
                 'port':that.addinfoForm.port,
@@ -1199,11 +1243,14 @@ export default {
             that.infoDetailForm.serverPort = scope.serverPort;
         },
         //通讯修改
-        informationUpdate(scope){
+        async informationUpdate(scope){
             let that = this;
             console.log(scope);
             that.updateIndoDialogVisible = true;
+            let devicedata = await getAllDevice();
+            that.updatearrdeviceOptions = devicedata;
             that.updateinfoForm.name = scope.name;
+            that.updateinfoForm.deviceName = scope.deviceComm.device.id;
             that.updateinfoForm.type = scope.type.toString();
             that.updateinfoForm.address = scope.address;
             that.updateinfoForm.port = scope.port;
@@ -1215,11 +1262,16 @@ export default {
             that.updateinfoForm.serverPort = scope.serverPort;
             that.updateinfoForm.id = scope.id;
         },
+        updateinfodeviceChange(val){
+            let that = this;
+            that.updateinfoForm.deviceNameid = val;
+        },
         async sureinfoUpdate(){
             let that = this;
             let updateinformationdata = {
                 'id':that.updateinfoForm.id,
                 'name':that.updateinfoForm.name,
+                'device_id':that.updateinfoForm.deviceNameid,
                 'type':that.updateinfoForm.type,
                 'address':that.updateinfoForm.address,
                 'port':that.updateinfoForm.port,
