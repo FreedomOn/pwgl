@@ -77,8 +77,7 @@
                 </div>
             </el-tab-pane>
             <el-tab-pane label="传感器" name="two">
-                <div>传感器</div>
-                 <!-- <div class="header">
+                 <div class="header">
                     <span>
                         <el-button type="primary"  @click="addSensor()">新增传感器</el-button>
                     </span> 
@@ -86,8 +85,8 @@
                         <el-input v-model="sensorSelectInput"  placeholder="请输入传感器名字快速搜索" style="width:400px"></el-input>
                         <el-button type="primary" icon="el-icon-search"    @click="sensorSelect()">快速搜索</el-button>
                         </span>
-                </div> -->
-                <!-- <el-table
+                </div>
+                <el-table
                     :data="sensorTableData"
                     stripe
                     border
@@ -149,11 +148,10 @@
                     layout="total, sizes, prev, pager, next, jumper"
                     :total="sensortotal">
                     </el-pagination>
-                </div> -->
+                </div>
             </el-tab-pane>
             <el-tab-pane label="通讯信息" name="three">
-                <div>通讯信息</div>
-                 <!-- <div class="header">
+                 <div class="header">
                     <span>
                         <el-button type="primary"  @click="addInformation()">新增通讯信息</el-button>
                     </span> 
@@ -161,8 +159,8 @@
                         <el-input v-model="informationSelectInput"  placeholder="请输入通讯信息名称快速搜索" style="width:400px"></el-input>
                         <el-button type="primary" icon="el-icon-search"    @click="informationSelect()">快速搜索</el-button>
                         </span>
-                </div> -->
-                <!-- <el-table
+                </div>
+                <el-table
                     :data="informationTableData"
                     stripe
                     border
@@ -225,7 +223,7 @@
                     layout="total, sizes, prev, pager, next, jumper"
                     :total="informationtotal">
                     </el-pagination>
-                </div> -->
+                </div>
             </el-tab-pane>
         </el-tabs>
          <!-- 修改宿主机 -->

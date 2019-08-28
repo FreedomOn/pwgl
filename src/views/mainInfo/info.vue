@@ -156,8 +156,8 @@ export default {
             url:'/wlsbgl/index/statusDevice',
         })
         .then((res) => {
-            console.log(res.data);
-            this.histchartData.rows = res.data.rows
+            console.log(res.data.rows,'容器状态统计');
+            this.histchartData.rows = res.data.rows;
         })
         .catch((err) => {
             console.log(err)
@@ -170,7 +170,7 @@ export default {
             url:' /wlsbgl/index/typeDevice',
         })
         .then((res) => {
-            console.log(res.data);
+            console.log(res.data.rows,'设备类型');
             this.piechartData.rows = res.data.rows;
             console.log(this.piechartData.rows)
         })
@@ -185,15 +185,15 @@ export default {
             url:'/wlsbgl/index/DeviceGroup'
         })
         .then((res) => {
-            console.log(res.data);
+            console.log(res.data.rows,'设备分钟');
             this.piechartDataGroup.rows = res.data.rows;
-            let groupData = res.data.rows;
-            let arr = [];
-            for(let i=0;i<groupData.length;i++){
-                arr.push(groupData[i].设备分组)
-            }
-            console.log(arr);
-            this.piechartDataGroup.columns = arr;
+            // let groupData = res.data.rows;
+            // let arr = [];
+            // for(let i=0;i<groupData.length;i++){
+            //     arr.push(groupData[i].设备分组)
+            // }
+            // console.log(arr);
+            // this.piechartDataGroup.columns = arr;
         })
         .catch((err) => {
             console.log(err)
@@ -226,22 +226,27 @@ export default {
   data () {  
     //设备类型扇形图
     this.piechartSettings = {
-      dimension: '设备类型',
-      metrics: '设备个数',
+      dimension: 'sblx',
+      metrics: 'sbgs',
       radius: 60,
       offsetY:140
     }
     //设备分组扇形图
     this.piechartSettingsGroup = {
-      dimension: '设备分组',
-      metrics: '设备个数',
+      dimension: 'sbfz',
+      metrics: 'sbgs',
       radius: 60,
       offsetY:140
     }
     //容器状态统计柱状图
     this.histchartSettings = {
-      metrics: ['在线', '离线', '故障'],
-       dimension: ['容器状态']
+       metrics: ['zx', 'lx', 'gz'],
+       dimension: ['容器状态'],
+        labelMap: {
+          'zx': '在线',
+          'lx': '离线',
+          'gz': '故障',
+        }
     }
     //容器状体 柱状图 显示具体条数设置
     this.extend = {
@@ -253,11 +258,20 @@ export default {
     this.deviceLineChartSettings = {
        xAxisType: 'time',
        yAxisName: ['数量',],
+       labelMap: {
+          'wgsb': '网管设备',
+          'zdsb': '终端设备',
+        }
     }
     //设备状态趋势横坐标以time类型显示 纵坐标显示表头数量
     this.deviceTypeLineChartSettings = {
        xAxisType: 'time',
        yAxisName: ['数量',],
+       labelMap: {
+          'zx': '在线',
+          'lx': '离线',
+          'gz': '故障',
+        }
     }
     //设置时间显示旋转45度
     this.deviceextend = {
@@ -269,27 +283,27 @@ export default {
     return {
       //设备类型数据
       piechartData: {
-            columns: ['网关设备', '终端设备'],
+            columns: [],
             rows: []
         },
       //设备分组数据
-       piechartDataGroup: {
+      piechartDataGroup: {
             columns: [],
             rows: []
         },
         //容器状态统计数据
-        histchartData: {
+       histchartData: {
             columns: [ '在线', '离线', '故障'],
             rows: []
         },
         //设备数量趋势数据
         deviceLineChartData: {
-            columns: ['日期', '网关设备', '终端设备', ],
+            columns: ['rq', 'wgsb', 'zdsb', ],
             rows: []
         },
         //设备状态趋势数据
         deviceTypeLineChartData:{
-           columns: ['日期', '在线', '离线', '故障'],
+           columns: ['rq', 'zx', 'lx', 'gz'],
             rows: []
         },
         //时间选择

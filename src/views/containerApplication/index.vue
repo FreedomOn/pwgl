@@ -16,6 +16,7 @@
                                 stripe
                                 border
                                 :height="tableHeight"
+                                highlight-current-row
                                 style="width: 100%;margin-top:10px"
                                 v-loading="deployloading"
                                 element-loading-text="拼命加载中">
@@ -642,8 +643,8 @@
                 </el-table-column>
             </el-table>
             <span slot="footer" class="dialog-footer">
-                <el-button type="primary" @click="arrangeDialogVisible = false">确 定</el-button>
-                <el-button @click="arrangeDialogVisible = false">取 消</el-button>
+                <el-button  @click="arrangeDialogVisible = false">关闭</el-button>
+                <!-- <el-button @click="arrangeDialogVisible = false">取 消</el-button> -->
             </span>
         </el-dialog>
     </div>

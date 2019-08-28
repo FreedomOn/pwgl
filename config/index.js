@@ -12,8 +12,9 @@ module.exports = {
     assetsPublicPath: '/',
     proxyTable: {
       '/wlsbgl': {
-          target: 'http://192.168.1.105:8080/wlsbgl', // 乔威 文华校区
+          target: 'http://192.168.1.107:8080/wlsbgl', // 乔威 文华校区
           // target: 'http://192.168.0.23:8080/wlsbgl', // 乔威 浙商大厦
+          // target: 'http://172.30.50.101:8080/wlsbgl', // 自己
           changeOrigin: true,
           pathRewrite: {                //需要rewrite重写的, 如果在服务器端做了处理则可以不要这段
             '^/wlsbgl': ''
